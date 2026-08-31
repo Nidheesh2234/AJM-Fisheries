@@ -7,8 +7,8 @@ import AuthModal from './components/AuthModal';
 import { api } from './utils/api';
 
 export default function App() {
-  const [user, setUser] = useState(null);        // { id, email, ... } from session
-  const [profile, setProfile] = useState(null);   // { full_name, role, ... } from profiles table
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [currentView, setCurrentView] = useState('home');
   const [portalSubView, setPortalSubView] = useState('market');
   const [authOpen, setAuthOpen] = useState(false);
@@ -16,10 +16,13 @@ export default function App() {
   const [preSelectedFish, setPreSelectedFish] = useState('');
   const [authLoading, setAuthLoading] = useState(true);
   
-  // Live ticker inventory
+  // Dynamic CMS state
   const [tickerItems, setTickerItems] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [partnerCards, setPartnerCards] = useState([]);
+  const [valueCards, setValueCards] = useState([]);
+  const [siteSettings, setSiteSettings] = useState({});
 
-  // Fetch user profile from profiles table
   const loadProfile = async (userId) => {
     try {
       const p = await api.getProfile(userId);
@@ -69,25 +72,30 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Load ticker inventory
-  useEffect(() => {
-    const loadTicker = async () => {
-      try {
-        const data = await api.getInventory();
-        setTickerItems(data || []);
-      } catch (err) {
-        setTickerItems([
-          { species: 'White Pomfret (Chanduva)', current_price_inr: 850 },
-          { species: 'Seer Fish / Kingfish (Konema)', current_price_inr: 950 },
-          { species: 'Bay Tiger Prawns (Royyalu)', current_price_inr: 650 },
-          { species: 'Indian Mackerel (Kanagarthalu)', current_price_inr: 250 }
-        ]);
-      }
-    };
-    loadTicker();
-  }, []);
+  // Fetch dynamic CMS data on mount & view changes
+  const loadCmsData = async () => {
+    try {
+      const [inv, test, part, val, setts] = await Promise.all([
+        api.getInventory(),
+        api.getTestimonials(),
+        api.getPartnerCards(),
+        api.getValueCards(),
+        api.getSiteSettings()
+      ]);
+      setTickerItems(inv || []);
+      setTestimonials(test || []);
+      setPartnerCards(part || []);
+      setValueCards(val || []);
+      setSiteSettings(setts || {});
+    } catch (err) {
+      console.error('CMS load error:', err);
+    }
+  };
 
-  // Combined user object for child components
+  useEffect(() => {
+    loadCmsData();
+  }, [currentView]);
+
   const combinedUser = user && profile ? {
     id: user.id,
     email: user.email,
@@ -136,7 +144,7 @@ export default function App() {
   };
 
   const handleEmergencyContact = () => {
-    alert("AJM Maritime Executive Desk:\n\nFor high-tonnage charter bookings or priority harbor shipments, please contact our Visakhapatnam trading office at +91 891 255 1204 or email bulk@ajmfisheries.com.");
+    alert(`AJM Maritime Executive Desk:\n\nFor high-tonnage charter bookings or priority harbor shipments, please contact our Visakhapatnam trading office at ${siteSettings.footer_phone || '+91 891 255 1204'} or email ${siteSettings.footer_email || 'bulk@ajmfisheries.com'}.`);
   };
 
   if (authLoading) {
@@ -169,7 +177,7 @@ export default function App() {
         {/* VIEW: HOME LANDING PAGE */}
         {currentView === 'home' && (
           <div>
-            {/* 1. HERO SECTION — Full Bleed Maritime Trawler at Dawn */}
+            {/* 1. HERO SECTION */}
             <section 
               className="hero-landing"
               style={{ 
@@ -183,10 +191,10 @@ export default function App() {
                   Today's Catch Arrived at Vizag Fishing Harbour
                 </div>
                 <h1 className="hero-title">
-                  Fresh From Vizag's Waters To Your Business
+                  {siteSettings.hero_title || "Fresh From Vizag's Waters To Your Business"}
                 </h1>
                 <p className="hero-subtitle">
-                  Direct-from-ocean bulk seafood supply. Zero middleman markups, transparent daily pricing in Indian Rupees (₹), and temperature-controlled container logistics for luxury hotels, restaurant chains, exporters, and regional distributors nationwide.
+                  {siteSettings.hero_subtitle || 'Direct-from-ocean bulk seafood supply. Zero middleman markups, transparent daily pricing in Indian Rupees (₹), and temperature-controlled container logistics for luxury hotels, restaurant chains, exporters, and regional distributors nationwide.'}
                 </p>
                 <div className="hero-ctas">
                   <button className="btn btn-primary" onClick={handleOrderBulkClick}>
@@ -205,8 +213,17 @@ export default function App() {
                 <div className="ticker-track">
                   {[...tickerItems, ...tickerItems].map((item, idx) => (
                     <span key={idx} className="ticker-item">
+                      {item.image_url ? (
+                        <img 
+                          src={item.image_url} 
+                          alt="" 
+                          style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border-gold)' }} 
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--color-gold)' }}>🐟</span>
+                      )}
                       <span className="species">{item.species}</span>
-                      <span className="price">₹{(item.current_price_inr || 0).toFixed(2)}/kg</span>
+                      <span className="price">₹{(item.current_price_inr || 0).toFixed(2)}/{item.unit || 'kg'}</span>
                       <span className="ticker-sep">|</span>
                     </span>
                   ))}
@@ -235,19 +252,19 @@ export default function App() {
                     Every catch is audited at the docks, cleaned, sorted by size, and packed into cold crates within hours of landing. This strict quality check guarantees fresh-state texture and peak moisture lock, satisfying demanding B2B culinary standards.
                   </p>
                   
-                  {/* Stat Blocks with Gold Top Border */}
+                  {/* Dynamic Stat Blocks */}
                   <div className="stats-grid">
                     <div className="stat-card">
-                      <div className="stat-number">10K+</div>
-                      <div className="stat-label">KG Daily</div>
+                      <div className="stat-number">{siteSettings.stat_1_num || '10K+'}</div>
+                      <div className="stat-label">{siteSettings.stat_1_label || 'KG Daily'}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="stat-number">100%</div>
-                      <div className="stat-label">Vizag Coast</div>
+                      <div className="stat-number">{siteSettings.stat_2_num || '100%'}</div>
+                      <div className="stat-label">{siteSettings.stat_2_label || 'Vizag Coast'}</div>
                     </div>
                     <div className="stat-card">
-                      <div className="stat-number" style={{ color: 'var(--color-gold)' }}>0%</div>
-                      <div className="stat-label">Middlemen</div>
+                      <div className="stat-number" style={{ color: 'var(--color-gold)' }}>{siteSettings.stat_3_num || '0%'}</div>
+                      <div className="stat-label">{siteSettings.stat_3_label || 'Middlemen'}</div>
                     </div>
                   </div>
                 </div>
@@ -262,7 +279,7 @@ export default function App() {
               </div>
             </section>
 
-            {/* 4. CORE VALUE PROPOSITIONS */}
+            {/* 4. CORE VALUE PROPOSITIONS (Dynamic Cards) */}
             <section className="section" id="why-us-section">
               <div className="section-header">
                 <span className="section-eyebrow">Our Value</span>
@@ -273,54 +290,24 @@ export default function App() {
               </div>
 
               <div className="props-grid">
-                <div className="prop-card">
-                  <div className="prop-image-container">
-                    <img 
-                      src="https://images.unsplash.com/photo-1504470695779-75300268aa0e?auto=format&fit=crop&w=800&q=85" 
-                      alt="Commercial deep-sea fishing trawlers at Vizag port" 
-                      className="prop-img" 
-                    />
+                {valueCards.map(v => (
+                  <div key={v.id} className="prop-card">
+                    {v.image_url && (
+                      <div className="prop-image-container">
+                        <img src={v.image_url} alt={v.heading} className="prop-img" />
+                      </div>
+                    )}
+                    <div className="prop-icon-wrap">
+                      <svg className="prop-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="6" r="2"></circle><line x1="12" y1="8" x2="12" y2="22"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
+                      <h3>{v.heading}</h3>
+                    </div>
+                    <p>{v.description}</p>
                   </div>
-                  <div className="prop-icon-wrap">
-                    <svg className="prop-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="6" r="2"></circle><line x1="12" y1="8" x2="12" y2="22"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
-                    <h3>Direct Fleet Sourcing</h3>
-                  </div>
-                  <p>Our fleet navigates the deep waters of the Bay of Bengal, returning fresh catches directly to our private docks at Visakhapatnam harbour.</p>
-                </div>
-
-                <div className="prop-card">
-                  <div className="prop-image-container">
-                    <img 
-                      src="https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?auto=format&fit=crop&w=800&q=85" 
-                      alt="Fresh seafood quality inspection and sorting on ice" 
-                      className="prop-img" 
-                    />
-                  </div>
-                  <div className="prop-icon-wrap">
-                    <svg className="prop-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                    <h3>Price Transparency</h3>
-                  </div>
-                  <p>No hidden brokerage fees. Daily updated INR rates are published directly from dock landing ledgers onto our digital market board.</p>
-                </div>
-
-                <div className="prop-card">
-                  <div className="prop-image-container">
-                    <img 
-                      src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=85" 
-                      alt="Refrigerated cold-chain transport truck for bulk seafood delivery" 
-                      className="prop-img" 
-                    />
-                  </div>
-                  <div className="prop-icon-wrap">
-                    <svg className="prop-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                    <h3>GPS Tracked Cold-Chain</h3>
-                  </div>
-                  <p>Transported in temperature-monitored refrigerated freighter containers. Deliveries are dispatched using Google Maps coordinate tracking.</p>
-                </div>
+                ))}
               </div>
             </section>
 
-            {/* 5. CLIENTELE & SOCIAL PROOF — Real Photography Thumbnails */}
+            {/* 5. CLIENTELE & PARTNER NETWORK (Dynamic Cards & Testimonials) */}
             <section className="section">
               <div className="section-header">
                 <span className="section-eyebrow">Partner Network</span>
@@ -331,62 +318,29 @@ export default function App() {
               </div>
 
               <div className="clients-grid" style={{ marginBottom: '3.5rem' }}>
-                <div className="client-card">
-                  <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=85" alt="Five-Star Hotels" className="client-thumb" />
-                  <div>
-                    <h4>Five-Star Hotels</h4>
-                    <p>Premium pomfret & lobster</p>
+                {partnerCards.map(p => (
+                  <div key={p.id} className="client-card">
+                    {p.image_url && <img src={p.image_url} alt={p.title} className="client-thumb" />}
+                    <div>
+                      <h4>{p.title}</h4>
+                      <p>{p.description}</p>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="client-card">
-                  <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=85" alt="Restaurant Chains" className="client-thumb" />
-                  <div>
-                    <h4>Restaurant Chains</h4>
-                    <p>Consistent wholesale fish supply</p>
-                  </div>
-                </div>
-
-                <div className="client-card">
-                  <img src="https://images.unsplash.com/photo-1586528116493-a029325540fa?auto=format&fit=crop&w=400&q=85" alt="Export Houses" className="client-thumb" />
-                  <div>
-                    <h4>Export Houses</h4>
-                    <p>Flash-frozen tiger prawns</p>
-                  </div>
-                </div>
-
-                <div className="client-card">
-                  <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=400&q=85" alt="Supermarket Docks" className="client-thumb" />
-                  <div>
-                    <h4>Supermarket Docks</h4>
-                    <p>Daily packed distribution units</p>
-                  </div>
-                </div>
+                ))}
               </div>
 
-              {/* Pull-Quote Testimonials */}
+              {/* Dynamic Pull-Quote Testimonials */}
               <div className="grid-2">
-                <div className="testimonial-card">
-                  <div className="testimonial-quote-mark">“</div>
-                  <p className="testimonial-text">
-                    Transitioning our seafood procurement to AJM Fisheries Vizag cut our supply chains by 3 days. The Seer Fish arrives in perfect cold-chain condition directly at our RK Beach hotel depot.
-                  </p>
-                  <div>
-                    <div className="testimonial-author">N. Ramakrishna</div>
-                    <div className="testimonial-role">Culinary Director, Grand Andhra Resort</div>
+                {testimonials.map(t => (
+                  <div key={t.id} className="testimonial-card">
+                    <div className="testimonial-quote-mark">“</div>
+                    <p className="testimonial-text">{t.quote}</p>
+                    <div>
+                      <div className="testimonial-author">{t.author_name}</div>
+                      <div className="testimonial-role">{t.role}</div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="testimonial-card">
-                  <div className="testimonial-quote-mark">“</div>
-                  <p className="testimonial-text">
-                    Having instant daily INR rate disclosures makes commercial catering bidding highly predictable. The Google Maps delivery coordinate dropoff ensures cargo container logistics run smoothly.
-                  </p>
-                  <div>
-                    <div className="testimonial-author">Pranav Sharma</div>
-                    <div className="testimonial-role">Logistics Lead, Oceanic Processors Ltd</div>
-                  </div>
-                </div>
+                ))}
               </div>
             </section>
 
@@ -442,7 +396,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 7. ENRICHED B2B FOOTER */}
+      {/* FOOTER */}
       <footer className="site-footer" id="contact-section">
         <div className="footer-grid">
           <div className="footer-brand">
@@ -462,16 +416,14 @@ export default function App() {
           </div>
           <div className="footer-col">
             <h4>Logistics</h4>
-            <p>Vizag Fishing Harbour</p>
-            <p>Visakhapatnam, 530001</p>
-            <p>Andhra Pradesh, India</p>
+            <p>{siteSettings.footer_address || 'Vizag Fishing Harbour, Visakhapatnam, 530001, AP, India'}</p>
           </div>
           <div className="footer-col">
             <h4>Contact Info</h4>
-            <p>📞 +91 891 255 1204</p>
-            <p>✉️ bulk@ajmfisheries.com</p>
+            <p>📞 {siteSettings.footer_phone || '+91 891 255 1204'}</p>
+            <p>✉️ {siteSettings.footer_email || 'bulk@ajmfisheries.com'}</p>
             <p style={{ fontSize: '0.78rem', color: 'var(--color-gold)', marginTop: '0.5rem', fontWeight: 'bold' }}>
-              GSTIN: 37AAHCA8492K1Z9
+              GSTIN: {siteSettings.footer_gstin || '37AAHCA8492K1Z9'}
             </p>
           </div>
         </div>

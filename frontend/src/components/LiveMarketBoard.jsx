@@ -35,6 +35,28 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
     }
   };
 
+  // Gold Fish Silhouette Placeholder SVG
+  const FishPlaceholder = () => (
+    <div style={{
+      width: '48px',
+      height: '48px',
+      borderRadius: '8px',
+      background: 'rgba(201, 166, 91, 0.1)',
+      border: '1px solid var(--color-border-gold)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'var(--color-gold)',
+      flexShrink: 0
+    }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M18 12c0-3.5-3-6-7-6-5 0-9 4-9 6s4 6 9 6c4 0 7-2.5 7-6z"></path>
+        <path d="M18 12l4-4v8l-4-4z"></path>
+        <circle cx="7" cy="11" r="1" fill="currentColor"></circle>
+      </svg>
+    </div>
+  );
+
   return (
     <div className="card">
       <div className="market-header">
@@ -74,6 +96,7 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
             <thead>
               <tr>
                 <th>Seafood Species</th>
+                <th>Category / Local</th>
                 <th>Price per Unit (INR)</th>
                 <th>Availability</th>
                 <th style={{ textAlign: 'right' }}>Procurement Actions</th>
@@ -83,12 +106,46 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
               {inventory.map((fish) => (
                 <tr key={fish.id}>
                   <td>
-                    <div className="fish-name">{fish.species}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                      {fish.image_url ? (
+                        <img 
+                          src={fish.image_url} 
+                          alt={fish.species} 
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '8px',
+                            objectFit: 'cover',
+                            border: '1px solid var(--color-border-gold)',
+                            flexShrink: 0
+                          }}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <FishPlaceholder />
+                      )}
+                      <div>
+                        <div className="fish-name">{fish.species}</div>
+                        {fish.local_name && (
+                          <div style={{ fontSize: '0.78rem', color: 'var(--color-gold)', fontWeight: '500' }}>
+                            {fish.local_name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-dark-secondary)' }}>
+                      {fish.category || 'Fish'}
+                    </span>
                   </td>
                   <td>
                     <div className="fish-price">
                       ₹{parseFloat(fish.current_price_inr || 0).toFixed(2)}{' '}
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-secondary)' }}>/ kg</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-secondary)' }}>/ {fish.unit || 'kg'}</span>
                     </div>
                   </td>
                   <td>

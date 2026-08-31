@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
+import PaymentPolicyModal from './PaymentPolicyModal';
 
 export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }) {
   const [inventory, setInventory] = useState([]);
@@ -12,6 +13,10 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
   const [myOrders, setMyOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
 
+  // Policy Modal state
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
+
+  // Status states
   const [loading, setLoading] = useState(false);
   const [inventoryLoading, setInventoryLoading] = useState(true);
   const [error, setError] = useState('');
@@ -72,7 +77,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
     return pricePerKg * qty * multiplier;
   };
 
-  const handleOrderSubmit = async (e) => {
+  const handleOrderFormClick = (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -94,6 +99,12 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
       return;
     }
 
+    // Intercept with Payment Policy Confirmation Modal
+    setShowPolicyModal(true);
+  };
+
+  const confirmAndSubmitOrder = async () => {
+    setShowPolicyModal(false);
     setLoading(true);
 
     try {
@@ -168,7 +179,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
             <p>All seafood species are currently out of stock or out of season.</p>
           </div>
         ) : (
-          <form onSubmit={handleOrderSubmit} className="grid-2">
+          <form onSubmit={handleOrderFormClick} className="grid-2">
             <div>
               <div className="form-group">
                 <label className="form-label">Select Seafood Variety</label>
@@ -277,7 +288,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                 style={{ width: '100%', padding: '0.95rem', fontSize: '1rem', marginTop: '1.5rem' }}
                 disabled={loading}
               >
-                {loading ? 'Transmitting order details...' : 'Submit Procurement Contract'}
+                {loading ? 'Transmitting order details...' : 'Submit Wholesale Order Contract'}
               </button>
             </div>
           </form>
@@ -386,6 +397,13 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
           </div>
         )}
       </div>
+
+      {/* Payment Policy Modal Component */}
+      <PaymentPolicyModal 
+        isOpen={showPolicyModal}
+        onClose={() => setShowPolicyModal(false)}
+        onAccept={confirmAndSubmitOrder}
+      />
 
     </div>
   );

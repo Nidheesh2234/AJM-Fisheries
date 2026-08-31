@@ -36,7 +36,7 @@ export default function PaymentPolicyModal({ isOpen, onClose, onAccept }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.5rem' }}>
             <div style={{
               display: 'flex',
-              justify-content: 'space-between',
+              justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0.85rem 1.1rem',
               background: 'var(--bg-ivory)',
@@ -52,7 +52,7 @@ export default function PaymentPolicyModal({ isOpen, onClose, onAccept }) {
 
             <div style={{
               display: 'flex',
-              justify-content: 'space-between',
+              justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0.85rem 1.1rem',
               background: 'var(--bg-ivory)',

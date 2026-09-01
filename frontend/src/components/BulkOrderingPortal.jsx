@@ -99,7 +99,6 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
       return;
     }
 
-    // Intercept with Payment Policy Confirmation Modal
     setShowPolicyModal(true);
   };
 
@@ -132,21 +131,21 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
 
   if (!user) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+      <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.25rem' }}>
         <svg style={{ width: '48px', height: '48px', color: 'var(--color-gold)', marginBottom: '1rem' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="12" cy="6" r="2"></circle>
           <line x1="12" y1="8" x2="12" y2="22"></line>
           <path d="M5 12H2a10 10 0 0 0 20 0h-3"></path>
         </svg>
-        <h2 style={{ fontSize: '1.6rem', marginBottom: '0.5rem', fontFamily: 'var(--font-serif)' }}>Wholesale Purchasing Portal</h2>
-        <p style={{ color: 'var(--text-dark-secondary)', maxWidth: '460px', margin: '0 auto 2rem auto', fontSize: '0.95rem' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'var(--font-serif)' }}>Wholesale Purchasing Portal</h2>
+        <p style={{ color: 'var(--text-dark-secondary)', maxWidth: '460px', margin: '0 auto 1.75rem auto', fontSize: '0.92rem' }}>
           Access to the AJM Visakhapatnam maritime procurement ledger is reserved for commercial partners.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <button className="btn btn-primary" onClick={() => onOpenAuth(false)}>
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" onClick={() => onOpenAuth(false)} style={{ flex: '1 1 140px' }}>
             Sign In to Account
           </button>
-          <button className="btn btn-secondary" onClick={() => onOpenAuth(false)}>
+          <button className="btn btn-secondary" onClick={() => onOpenAuth(false)} style={{ flex: '1 1 140px' }}>
             Register Company
           </button>
         </div>
@@ -158,12 +157,12 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
   const estimatedTotal = calculateTotal();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
       {/* Ordering Form Card */}
       <div className="card">
-        <h2 style={{ fontSize: '1.6rem', marginBottom: '0.35rem', fontFamily: 'var(--font-serif)' }}>Bulk Ordering Portal</h2>
-        <p style={{ color: 'var(--text-dark-secondary)', fontSize: '0.9rem', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.35rem', fontFamily: 'var(--font-serif)' }}>Bulk Ordering Portal</h2>
+        <p style={{ color: 'var(--text-dark-secondary)', fontSize: '0.88rem', marginBottom: '1.75rem' }}>
           Execute wholesale procurement contracts directly into our Vizag cargo logistics ledger.
         </p>
 
@@ -171,11 +170,11 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
         {success && <div className="alert alert-success">{success}</div>}
 
         {inventoryLoading ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-dark-secondary)' }}>
+          <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-dark-secondary)' }}>
             <p>Analyzing current cargo holds and harbor metrics...</p>
           </div>
         ) : inventory.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-coral)' }}>
+          <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--color-coral)' }}>
             <p>All seafood species are currently out of stock or out of season.</p>
           </div>
         ) : (
@@ -199,7 +198,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
 
               <div className="form-group">
                 <label className="form-label">Procurement Quantity</label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <input 
                     type="number" 
                     step="any"
@@ -207,14 +206,14 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                     placeholder="e.g. 500" 
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    style={{ flex: 2 }}
+                    style={{ flex: '2 1 140px' }}
                     required
                   />
                   <select 
                     className="form-input" 
                     value={quantityUnit}
                     onChange={(e) => setQuantityUnit(e.target.value)}
-                    style={{ flex: 1 }}
+                    style={{ flex: '1 1 100px' }}
                   >
                     <option value="kg">kg (Kilograms)</option>
                     <option value="tons">Tons (Metric)</option>
@@ -248,35 +247,35 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
             </div>
 
             {/* Pricing Summary Side Card */}
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
-              <div style={{ background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-lg)', padding: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.15rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)', color: 'var(--text-dark-primary)', borderBottom: '1px solid var(--color-border-gold)', paddingBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between', gap: '1.25rem' }}>
+              <div style={{ background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-lg)', padding: '1.25rem' }}>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', fontFamily: 'var(--font-serif)', color: 'var(--text-dark-primary)', borderBottom: '1px solid var(--color-border-gold)', paddingBottom: '0.6rem' }}>
                   Procurement Summary (₹ INR)
                 </h3>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
                   <span>Contract Holder:</span>
                   <span style={{ color: 'var(--text-dark-primary)', fontWeight: '600' }}>{user.name || user.email}</span>
                 </div>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
                   <span>Selected Stock:</span>
                   <span style={{ color: 'var(--text-dark-primary)', fontWeight: '600' }}>{fishType || '-'}</span>
                 </div>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
                   <span>Unit Rate:</span>
                   <span>₹{selectedPrice.toFixed(2)} / kg</span>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
                   <span>Selected Weight:</span>
                   <span style={{ color: 'var(--color-gold)', fontWeight: '700' }}>
                     {quantity ? `${parseFloat(quantity).toLocaleString()} ${quantityUnit}` : '0'}
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--color-border-gold)', fontWeight: '700', fontSize: '1.1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px dashed var(--color-border-gold)', fontWeight: '700', fontSize: '1rem' }}>
                   <span>Estimated Value:</span>
                   <span style={{ color: 'var(--color-gold)' }}>₹{estimatedTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} INR</span>
                 </div>
@@ -285,7 +284,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
               <button 
                 type="submit" 
                 className="btn btn-primary" 
-                style={{ width: '100%', padding: '0.95rem', fontSize: '1rem', marginTop: '1.5rem' }}
+                style={{ width: '100%', padding: '0.85rem', fontSize: '0.95rem' }}
                 disabled={loading}
               >
                 {loading ? 'Transmitting order details...' : 'Submit Wholesale Order Contract'}
@@ -297,7 +296,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
 
       {/* Orders Ledger / Active Contracts List */}
       <div className="card">
-        <h3 style={{ fontSize: '1.35rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)', color: 'var(--text-dark-primary)' }}>Active B2B Procurement Contracts</h3>
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)', color: 'var(--text-dark-primary)' }}>Active B2B Procurement Contracts</h3>
         
         {ordersLoading ? (
           <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-dark-secondary)' }}><p>Loading shipment records...</p></div>
@@ -306,8 +305,8 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
             <p>You have not placed any wholesale contracts yet.</p>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="market-table" style={{ fontSize: '0.88rem' }}>
+          <div className="responsive-table-wrap">
+            <table className="market-table" style={{ fontSize: '0.85rem' }}>
               <thead>
                 <tr>
                   <th>Order Ref</th>
@@ -340,7 +339,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                         </div>
                       </td>
                       <td>
-                        <div style={{ maxWidth: '200px', whiteSpace: 'normal', fontSize: '0.82rem', color: 'var(--text-dark-secondary)' }}>
+                        <div style={{ maxWidth: '180px', whiteSpace: 'normal', fontSize: '0.82rem', color: 'var(--text-dark-secondary)' }}>
                           {order.delivery_location}
                         </div>
                       </td>
@@ -356,7 +355,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                             target="_blank" 
                             rel="noopener noreferrer" 
                             className="btn btn-outline-navy"
-                            style={{ padding: '0.25rem 0.55rem', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                            style={{ padding: '0.25rem 0.55rem', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', minHeight: '32px' }}
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             Map Link ↗
@@ -377,7 +376,8 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                               fontSize: '0.72rem', 
                               display: 'inline-flex', 
                               alignItems: 'center', 
-                              gap: '0.3rem'
+                              gap: '0.3rem',
+                              minHeight: '32px'
                             }}
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>

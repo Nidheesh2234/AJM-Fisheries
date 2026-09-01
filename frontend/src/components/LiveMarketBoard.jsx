@@ -38,8 +38,8 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
   // Gold Fish Silhouette Placeholder SVG
   const FishPlaceholder = () => (
     <div style={{
-      width: '48px',
-      height: '48px',
+      width: '44px',
+      height: '44px',
       borderRadius: '8px',
       background: 'rgba(201, 166, 91, 0.1)',
       border: '1px solid var(--color-border-gold)',
@@ -49,7 +49,7 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
       color: 'var(--color-gold)',
       flexShrink: 0
     }}>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M18 12c0-3.5-3-6-7-6-5 0-9 4-9 6s4 6 9 6c4 0 7-2.5 7-6z"></path>
         <path d="M18 12l4-4v8l-4-4z"></path>
         <circle cx="7" cy="11" r="1" fill="currentColor"></circle>
@@ -59,22 +59,22 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
 
   return (
     <div className="card">
-      <div className="market-header">
+      <div className="market-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.6rem', marginBottom: '0.35rem', fontFamily: 'var(--font-serif)' }}>Live Vizag Market Registry</h2>
-          <p style={{ color: 'var(--text-dark-secondary)', fontSize: '0.9rem' }}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '0.35rem', fontFamily: 'var(--font-serif)' }}>Live Vizag Market Registry</h2>
+          <p style={{ color: 'var(--text-dark-secondary)', fontSize: '0.88rem' }}>
             Current net wholesale prices in Indian Rupees (₹) for Visakhapatnam bulk maritime distribution.
           </p>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           {lastUpdated && (
-            <div className="update-indicator" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-dark-secondary)' }}>
+            <div className="update-indicator" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: 'var(--text-dark-secondary)' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-gold)', display: 'inline-block' }}></span>
               <span>Updated: {lastUpdated}</span>
             </div>
           )}
-          <button className="btn btn-outline-navy" onClick={fetchInventory} style={{ padding: '0.45rem 0.9rem', fontSize: '0.8rem' }}>
+          <button className="btn btn-outline-navy" onClick={fetchInventory} style={{ padding: '0.45rem 0.9rem', fontSize: '0.8rem', minHeight: '38px' }}>
             Refresh Rates
           </button>
         </div>
@@ -91,12 +91,12 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
           <p>No catch varieties currently registered in inventory.</p>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
+        <div className="responsive-table-wrap">
           <table className="market-table">
             <thead>
               <tr>
                 <th>Seafood Species</th>
-                <th>Category / Local</th>
+                <th>Category</th>
                 <th>Price per Unit (INR)</th>
                 <th>Availability</th>
                 <th style={{ textAlign: 'right' }}>Procurement Actions</th>
@@ -106,14 +106,14 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
               {inventory.map((fish) => (
                 <tr key={fish.id}>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       {fish.image_url ? (
                         <img 
                           src={fish.image_url} 
                           alt={fish.species} 
                           style={{
-                            width: '48px',
-                            height: '48px',
+                            width: '44px',
+                            height: '44px',
                             borderRadius: '8px',
                             objectFit: 'cover',
                             border: '1px solid var(--color-border-gold)',
@@ -156,11 +156,11 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
                   <td style={{ textAlign: 'right' }}>
                     <button 
                       className="btn btn-primary" 
-                      style={{ padding: '0.4rem 1.1rem', fontSize: '0.8rem' }}
+                      style={{ padding: '0.4rem 0.9rem', fontSize: '0.78rem', minHeight: '36px' }}
                       disabled={fish.status === 'Out of Season'}
                       onClick={() => handleOrderClick(fish)}
                     >
-                      {fish.status === 'Out of Season' ? 'Out of Season' : 'Order Bulk Catch'}
+                      {fish.status === 'Out of Season' ? 'Out of Season' : 'Order Catch'}
                     </button>
                   </td>
                 </tr>
@@ -170,7 +170,7 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
         </div>
       )}
       
-      <div style={{ marginTop: '2rem', padding: '1.1rem', backgroundColor: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', fontSize: '0.85rem', color: 'var(--text-dark-secondary)' }}>
+      <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', fontSize: '0.82rem', color: 'var(--text-dark-secondary)' }}>
         <strong>B2B Maritime Distribution Terms:</strong> Net wholesale prices subject to dock volume availability. Cargo is shock-frozen and packed into temperature-controlled containers at Visakhapatnam Fishing Harbour.
       </div>
     </div>

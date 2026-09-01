@@ -99,7 +99,7 @@ export default function AdminDashboard({ user }) {
 
   if (!user || user.role !== 'admin') {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+      <div className="card" style={{ textAlign: 'center', padding: '4rem 1.5rem' }}>
         <svg style={{ width: '48px', height: '48px', color: 'var(--color-coral)', marginBottom: '1rem' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -112,7 +112,7 @@ export default function AdminDashboard({ user }) {
     );
   }
 
-  // Image Upload helper (converts uploaded file to Data URL for instant preview & persistence)
+  // Image Upload helper
   const handleImageFileChange = (e, setUrlFn) => {
     const file = e.target.files[0];
     if (file) {
@@ -162,7 +162,6 @@ export default function AdminDashboard({ user }) {
         });
         setSuccess(`Successfully added '${invSpecies}' to live rates board.`);
       }
-      // Reset form
       setInvSpecies(''); setInvLocalName(''); setInvPrice(''); setInvUnit('kg'); setInvCategory('Fish'); setInvImageUrl(''); setInvStatus('Available');
       loadData();
     } catch (err) {
@@ -199,7 +198,6 @@ export default function AdminDashboard({ user }) {
 
     setInventory(newArr);
 
-    // Update sort_order in database
     try {
       await Promise.all([
         api.updateInventoryItem(newArr[index].id, { sort_order: index + 1 }),
@@ -321,7 +319,7 @@ export default function AdminDashboard({ user }) {
     setSubmitting(true);
     try {
       await api.updateSiteSettings(settingsForm);
-      setSuccess('Site content settings and stat blocks saved successfully! Home page reflects changes immediately.');
+      setSuccess('Site content settings and stat blocks saved successfully!');
       setSiteSettings(settingsForm);
     } catch (err) { setError(err.message || 'Failed to update site settings.'); }
     finally { setSubmitting(false); }
@@ -348,27 +346,27 @@ export default function AdminDashboard({ user }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
       {/* CMS Sub-navigation Tabs */}
-      <div className="auth-tabs" style={{ gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid var(--color-border-gold)' }}>
+      <div className="auth-tabs" style={{ gap: '0.25rem', borderBottom: '1px solid var(--color-border-gold)', paddingBottom: '0.25rem' }}>
         <div className={`auth-tab ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>
           Live Rates Board
         </div>
         <div className={`auth-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
-          Orders Desk ({orders.filter(o => o.status === 'Pending').length})
+          Orders ({orders.filter(o => o.status === 'Pending').length})
         </div>
         <div className={`auth-tab ${activeTab === 'testimonials' ? 'active' : ''}`} onClick={() => setActiveTab('testimonials')}>
           Testimonials
         </div>
         <div className={`auth-tab ${activeTab === 'partners' ? 'active' : ''}`} onClick={() => setActiveTab('partners')}>
-          Partner Network
+          Partners
         </div>
         <div className={`auth-tab ${activeTab === 'values' ? 'active' : ''}`} onClick={() => setActiveTab('values')}>
-          Value & Logistics
+          Logistics Cards
         </div>
         <div className={`auth-tab ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-          Site Content & Stats
+          Site Content
         </div>
       </div>
 
@@ -379,7 +377,7 @@ export default function AdminDashboard({ user }) {
           1. LIVE RATES / INVENTORY CMS
          ============================================================ */}
       {activeTab === 'inventory' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* Add / Edit Inventory Form */}
           <div className="card">
@@ -388,19 +386,19 @@ export default function AdminDashboard({ user }) {
             </h3>
             
             <form onSubmit={handleSaveInventory} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label">Species Name</label>
                   <input type="text" className="form-input" placeholder="e.g. White Pomfret" value={invSpecies} onChange={(e) => setInvSpecies(e.target.value)} required />
                 </div>
 
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Local Name (Telugu/Regional)</label>
+                  <label className="form-label">Local Name</label>
                   <input type="text" className="form-input" placeholder="e.g. Chanduva" value={invLocalName} onChange={(e) => setInvLocalName(e.target.value)} />
                 </div>
 
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Price in INR (₹)</label>
+                  <label className="form-label">Price (INR ₹)</label>
                   <input type="number" step="0.01" className="form-input" placeholder="e.g. 850.00" value={invPrice} onChange={(e) => setInvPrice(e.target.value)} required />
                 </div>
 
@@ -434,30 +432,30 @@ export default function AdminDashboard({ user }) {
 
               {/* Image URL & File Upload Input */}
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Fish Photo Image URL or Local Photo Upload</label>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <input type="url" className="form-input" placeholder="Paste image URL (https://...)" value={invImageUrl} onChange={(e) => setInvImageUrl(e.target.value)} style={{ flex: 2 }} />
+                <label className="form-label">Fish Photo Image URL or File Upload</label>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input type="url" className="form-input" placeholder="Paste image URL (https://...)" value={invImageUrl} onChange={(e) => setInvImageUrl(e.target.value)} style={{ flex: '1 1 200px' }} />
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-dark-secondary)' }}>or</span>
-                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: 1, padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setInvImageUrl)} />
+                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: '1 1 180px', padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setInvImageUrl)} />
                 </div>
                 
                 {/* Live Preview Thumbnail */}
                 {invImageUrl && (
                   <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <img src={invImageUrl} alt="Preview" style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--color-border-gold)' }} />
-                    <button type="button" className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => setInvImageUrl('')}>
+                    <img src={invImageUrl} alt="Preview" style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--color-border-gold)' }} />
+                    <button type="button" className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => setInvImageUrl('')}>
                       Remove Photo
                     </button>
                   </div>
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 140px' }} disabled={submitting}>
                   {submitting ? 'Saving...' : editingInvId ? 'Update Entry' : '+ Add Entry'}
                 </button>
                 {editingInvId && (
-                  <button type="button" className="btn btn-outline-navy" onClick={cancelEditInv}>
+                  <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={cancelEditInv}>
                     Cancel
                   </button>
                 )}
@@ -476,7 +474,7 @@ export default function AdminDashboard({ user }) {
             ) : inventory.length === 0 ? (
               <p style={{ textAlign: 'center', padding: '2rem' }}>No entries found.</p>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
+              <div className="responsive-table-wrap">
                 <table className="market-table">
                   <thead>
                     <tr>
@@ -492,17 +490,17 @@ export default function AdminDashboard({ user }) {
                   <tbody>
                     {inventory.map((item, idx) => (
                       <tr key={item.id}>
-                        <td style={{ width: '70px' }}>
+                        <td style={{ width: '60px' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                            <button className="btn btn-outline-navy" style={{ padding: '0.1rem 0.3rem', fontSize: '0.65rem' }} disabled={idx === 0} onClick={() => handleMoveInventory(idx, -1)}>▲</button>
-                            <button className="btn btn-outline-navy" style={{ padding: '0.1rem 0.3rem', fontSize: '0.65rem' }} disabled={idx === inventory.length - 1} onClick={() => handleMoveInventory(idx, 1)}>▼</button>
+                            <button className="btn btn-outline-navy" style={{ padding: '0.15rem 0.35rem', fontSize: '0.75rem', minHeight: '28px' }} disabled={idx === 0} onClick={() => handleMoveInventory(idx, -1)}>▲</button>
+                            <button className="btn btn-outline-navy" style={{ padding: '0.15rem 0.35rem', fontSize: '0.75rem', minHeight: '28px' }} disabled={idx === inventory.length - 1} onClick={() => handleMoveInventory(idx, 1)}>▼</button>
                           </div>
                         </td>
                         <td>
                           {item.image_url ? (
-                            <img src={item.image_url} alt={item.species} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--color-border-gold)' }} />
+                            <img src={item.image_url} alt={item.species} style={{ width: '44px', height: '44px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--color-border-gold)' }} />
                           ) : (
-                            <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'rgba(201, 166, 91, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-gold)' }}>🐟</div>
+                            <div style={{ width: '44px', height: '44px', borderRadius: '8px', background: 'rgba(201, 166, 91, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-gold)' }}>🐟</div>
                           )}
                         </td>
                         <td>
@@ -513,9 +511,9 @@ export default function AdminDashboard({ user }) {
                         <td><span className="fish-price">₹{parseFloat(item.current_price_inr || 0).toFixed(2)}</span> /{item.unit || 'kg'}</td>
                         <td><span className={`badge ${item.status === 'Available' ? 'badge-available' : 'badge-outofstock'}`}>{item.status}</span></td>
                         <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                            <button className="btn btn-outline-navy" style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }} onClick={() => startEditInv(item)}>Edit</button>
-                            <button className="btn btn-danger" style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }} onClick={() => setDeleteModal({ open: true, type: 'inventory', id: item.id, name: item.species })}>Delete</button>
+                          <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                            <button className="btn btn-outline-navy" style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => startEditInv(item)}>Edit</button>
+                            <button className="btn btn-danger" style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => setDeleteModal({ open: true, type: 'inventory', id: item.id, name: item.species })}>Delete</button>
                           </div>
                         </td>
                       </tr>
@@ -539,7 +537,7 @@ export default function AdminDashboard({ user }) {
           ) : orders.length === 0 ? (
             <p style={{ textAlign: 'center', padding: '2rem' }}>No orders in ledger.</p>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
+            <div className="responsive-table-wrap">
               <table className="market-table" style={{ fontSize: '0.88rem' }}>
                 <thead>
                   <tr>
@@ -563,19 +561,19 @@ export default function AdminDashboard({ user }) {
                       </td>
                       <td style={{ maxWidth: '180px' }}>{order.delivery_location}</td>
                       <td>
-                        {order.google_maps_link ? <a href={order.google_maps_link} target="_blank" rel="noopener noreferrer" className="btn btn-outline-navy" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>Map Link ↗</a> : 'N/A'}
+                        {order.google_maps_link ? <a href={order.google_maps_link} target="_blank" rel="noopener noreferrer" className="btn btn-outline-navy" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }}>Map Link ↗</a> : 'N/A'}
                       </td>
-                      <td style={{ minWidth: '220px' }}>
+                      <td style={{ minWidth: '200px' }}>
                         <div style={{ display: 'flex', gap: '0.25rem' }}>
-                          <input type="text" className="form-input" placeholder="Paste tracking link" value={trackingInputs[order.id] || ''} onChange={(e) => setTrackingInputs({ ...trackingInputs, [order.id]: e.target.value })} style={{ fontSize: '0.75rem', padding: '0.2rem 0.4rem', height: '32px' }} />
-                          <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', height: '32px' }} onClick={() => handleSaveTracking(order.id)}>Save</button>
+                          <input type="text" className="form-input" placeholder="Paste tracking link" value={trackingInputs[order.id] || ''} onChange={(e) => setTrackingInputs({ ...trackingInputs, [order.id]: e.target.value })} style={{ fontSize: '0.75rem', padding: '0.2rem 0.4rem', height: '36px', minHeight: '36px' }} />
+                          <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', height: '36px', minHeight: '36px' }} onClick={() => handleSaveTracking(order.id)}>Save</button>
                         </div>
                       </td>
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '130px' }}>
                           <span className={`badge badge-${(order.status || 'pending').toLowerCase()}`}>{order.status}</span>
-                          {order.status === 'Pending' && <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleStatusChange(order.id, 'Dispatched')}>Mark Dispatched</button>}
-                          {order.status === 'Dispatched' && <button className="btn btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleStatusChange(order.id, 'Delivered')}>Mark Delivered</button>}
+                          {order.status === 'Pending' && <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }} onClick={() => handleStatusChange(order.id, 'Dispatched')}>Mark Dispatched</button>}
+                          {order.status === 'Dispatched' && <button className="btn btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }} onClick={() => handleStatusChange(order.id, 'Delivered')}>Mark Delivered</button>}
                         </div>
                       </td>
                     </tr>
@@ -599,7 +597,7 @@ export default function AdminDashboard({ user }) {
                 <label className="form-label">Client Quote</label>
                 <textarea className="form-input" rows="3" placeholder="Enter quote text..." value={testQuote} onChange={(e) => setTestQuote(e.target.value)} required />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">Author Name</label>
                   <input type="text" className="form-input" placeholder="e.g. N. Ramakrishna" value={testAuthor} onChange={(e) => setTestAuthor(e.target.value)} required />
@@ -609,9 +607,9 @@ export default function AdminDashboard({ user }) {
                   <input type="text" className="form-input" placeholder="e.g. Culinary Director, Grand Andhra Resort" value={testRole} onChange={(e) => setTestRole(e.target.value)} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>{editingTestId ? 'Update Testimonial' : '+ Add Testimonial'}</button>
-                {editingTestId && <button type="button" className="btn btn-outline-navy" onClick={() => { setEditingTestId(null); setTestQuote(''); setTestAuthor(''); setTestRole(''); }}>Cancel</button>}
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 160px' }} disabled={submitting}>{editingTestId ? 'Update Testimonial' : '+ Add Testimonial'}</button>
+                {editingTestId && <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={() => { setEditingTestId(null); setTestQuote(''); setTestAuthor(''); setTestRole(''); }}>Cancel</button>}
               </div>
             </form>
           </div>
@@ -620,14 +618,14 @@ export default function AdminDashboard({ user }) {
             <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Active Testimonials</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {testimonials.map(t => (
-                <div key={t.id} style={{ padding: '1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
+                <div key={t.id} style={{ padding: '1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ flex: '1 1 240px' }}>
                     <p style={{ fontStyle: 'italic', marginBottom: '0.4rem' }}>"{t.quote}"</p>
                     <strong style={{ color: 'var(--color-gold)' }}>{t.author_name}</strong> <span style={{ fontSize: '0.85rem', color: 'var(--text-dark-secondary)' }}>({t.role})</span>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="btn btn-outline-navy" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => startEditTest(t)}>Edit</button>
-                    <button className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => setDeleteModal({ open: true, type: 'testimonial', id: t.id, name: t.author_name })}>Delete</button>
+                    <button className="btn btn-outline-navy" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => startEditTest(t)}>Edit</button>
+                    <button className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => setDeleteModal({ open: true, type: 'testimonial', id: t.id, name: t.author_name })}>Delete</button>
                   </div>
                 </div>
               ))}
@@ -644,7 +642,7 @@ export default function AdminDashboard({ user }) {
           <div className="card">
             <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>{editingPartnerId ? 'Edit Partner Card' : '+ Add Partner Card'}</h3>
             <form onSubmit={handleSavePartnerCard} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">Category Title</label>
                   <input type="text" className="form-input" placeholder="e.g. Five-Star Hotels" value={partnerTitle} onChange={(e) => setPartnerTitle(e.target.value)} required />
@@ -656,31 +654,31 @@ export default function AdminDashboard({ user }) {
               </div>
               <div className="form-group">
                 <label className="form-label">Thumbnail Photo Image URL or Upload</label>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <input type="url" className="form-input" placeholder="https://..." value={partnerImageUrl} onChange={(e) => setPartnerImageUrl(e.target.value)} style={{ flex: 2 }} />
-                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: 1, padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setPartnerImageUrl)} />
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input type="url" className="form-input" placeholder="https://..." value={partnerImageUrl} onChange={(e) => setPartnerImageUrl(e.target.value)} style={{ flex: '1 1 200px' }} />
+                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: '1 1 180px', padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setPartnerImageUrl)} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>{editingPartnerId ? 'Update Card' : '+ Add Card'}</button>
-                {editingPartnerId && <button type="button" className="btn btn-outline-navy" onClick={() => { setEditingPartnerId(null); setPartnerTitle(''); setPartnerDesc(''); setPartnerImageUrl(''); }}>Cancel</button>}
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 140px' }} disabled={submitting}>{editingPartnerId ? 'Update Card' : '+ Add Card'}</button>
+                {editingPartnerId && <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={() => { setEditingPartnerId(null); setPartnerTitle(''); setPartnerDesc(''); setPartnerImageUrl(''); }}>Cancel</button>}
               </div>
             </form>
           </div>
 
           <div className="card">
             <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Partner Network Cards</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
               {partnerCards.map(c => (
-                <div key={c.id} style={{ padding: '1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div key={c.id} style={{ padding: '1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                   {c.image_url && <img src={c.image_url} alt={c.title} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />}
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: '1 1 120px' }}>
                     <h4 style={{ fontSize: '0.95rem' }}>{c.title}</h4>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-dark-secondary)' }}>{c.description}</p>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                    <button className="btn btn-outline-navy" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }} onClick={() => startEditPartner(c)}>Edit</button>
-                    <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }} onClick={() => setDeleteModal({ open: true, type: 'partner', id: c.id, name: c.title })}>Delete</button>
+                  <div style={{ display: 'flex', gap: '0.3rem' }}>
+                    <button className="btn btn-outline-navy" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }} onClick={() => startEditPartner(c)}>Edit</button>
+                    <button className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }} onClick={() => setDeleteModal({ open: true, type: 'partner', id: c.id, name: c.title })}>Delete</button>
                   </div>
                 </div>
               ))}
@@ -707,29 +705,29 @@ export default function AdminDashboard({ user }) {
               </div>
               <div className="form-group">
                 <label className="form-label">Card Header Photo Image URL or Upload</label>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <input type="url" className="form-input" placeholder="https://..." value={valueImageUrl} onChange={(e) => setValueImageUrl(e.target.value)} style={{ flex: 2 }} />
-                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: 1, padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setValueImageUrl)} />
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input type="url" className="form-input" placeholder="https://..." value={valueImageUrl} onChange={(e) => setValueImageUrl(e.target.value)} style={{ flex: '1 1 200px' }} />
+                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: '1 1 180px', padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setValueImageUrl)} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>{editingValueId ? 'Update Card' : '+ Add Card'}</button>
-                {editingValueId && <button type="button" className="btn btn-outline-navy" onClick={() => { setEditingValueId(null); setValueHeading(''); setValueDesc(''); setValueImageUrl(''); }}>Cancel</button>}
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 140px' }} disabled={submitting}>{editingValueId ? 'Update Card' : '+ Add Card'}</button>
+                {editingValueId && <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={() => { setEditingValueId(null); setValueHeading(''); setValueDesc(''); setValueImageUrl(''); }}>Cancel</button>}
               </div>
             </form>
           </div>
 
           <div className="card">
             <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Value & Logistics Cards</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
               {valueCards.map(v => (
                 <div key={v.id} style={{ padding: '1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)' }}>
                   {v.image_url && <img src={v.image_url} alt={v.heading} style={{ width: '100%', height: '140px', borderRadius: '8px', objectFit: 'cover', marginBottom: '0.75rem' }} />}
                   <h4 style={{ fontSize: '1.05rem', marginBottom: '0.35rem' }}>{v.heading}</h4>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-dark-secondary)', marginBottom: '1rem' }}>{v.description}</p>
                   <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                    <button className="btn btn-outline-navy" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => startEditValue(v)}>Edit</button>
-                    <button className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => setDeleteModal({ open: true, type: 'value', id: v.id, name: v.heading })}>Delete</button>
+                    <button className="btn btn-outline-navy" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => startEditValue(v)}>Edit</button>
+                    <button className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => setDeleteModal({ open: true, type: 'value', id: v.id, name: v.heading })}>Delete</button>
                   </div>
                 </div>
               ))}
@@ -762,7 +760,7 @@ export default function AdminDashboard({ user }) {
             {/* Stat Blocks */}
             <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
               <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>Stats Cards (Home Page)</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
                 <div>
                   <label className="form-label">Stat 1 Value</label>
                   <input type="text" className="form-input" value={settingsForm.stat_1_num || ''} onChange={(e) => setSettingsForm({ ...settingsForm, stat_1_num: e.target.value })} />
@@ -787,7 +785,7 @@ export default function AdminDashboard({ user }) {
             {/* Footer & Contact Settings */}
             <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
               <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>Footer & Corporate Contact Info</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">Phone Desk</label>
                   <input type="text" className="form-input" value={settingsForm.footer_phone || ''} onChange={(e) => setSettingsForm({ ...settingsForm, footer_phone: e.target.value })} />

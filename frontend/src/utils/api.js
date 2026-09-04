@@ -236,7 +236,7 @@ export const api = {
     }
     return [
       { id: 1, quote: 'Transitioning our seafood procurement to AJM Fisheries Vizag cut our supply chains by 3 days. The Seer Fish arrives in perfect cold-chain condition directly at our RK Beach hotel depot.', author_name: 'N. Ramakrishna', role: 'Culinary Director, Grand Andhra Resort' },
-      { id: 2, quote: 'Having instant daily INR rate disclosures makes commercial catering bidding highly predictable. The Google Maps delivery coordinate dropoff ensures cargo container logistics run smoothly.', author_name: 'Pranav Sharma', role: 'Logistics Lead, Oceanic Processors Ltd' }
+      { id: 2, quote: 'Having instant daily INR rate disclosures makes commercial catering bidding highly predictable. The Google Maps delivery coordinate dropoff ensures local cold-chain logistics run smoothly.', author_name: 'Pranav Sharma', role: 'Logistics Lead, Coastal Dining Group' }
     ];
   },
 
@@ -283,8 +283,8 @@ export const api = {
     return [
       { id: 1, title: 'Five-Star Hotels', description: 'Premium pomfret & lobster', image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=85' },
       { id: 2, title: 'Restaurant Chains', description: 'Consistent wholesale fish supply', image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=85' },
-      { id: 3, title: 'Export Houses', description: 'Flash-frozen tiger prawns', image_url: 'https://images.unsplash.com/photo-1586528116493-a029325540fa?auto=format&fit=crop&w=400&q=85' },
-      { id: 4, title: 'Supermarket Docks', description: 'Daily packed distribution units', image_url: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=400&q=85' }
+      { id: 3, title: 'Wholesale Distributors', description: 'Bulk Bay tiger prawns & catch', image_url: 'https://images.unsplash.com/photo-1586528116493-a029325540fa?auto=format&fit=crop&w=400&q=85' },
+      { id: 4, title: 'Catering Fleets', description: 'Daily packed distribution units', image_url: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=400&q=85' }
     ];
   },
 
@@ -362,22 +362,217 @@ export const api = {
     return true;
   },
 
+  // ---- CERTIFICATIONS CMS ----
+
+  getCertifications: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('certifications')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('id', { ascending: true });
+      if (error) throw error;
+      if (data && data.length > 0) return data;
+    } catch (e) {
+      console.warn('Certifications note:', e.message);
+    }
+    return [
+      { id: 1, label: 'FSSAI Wholesale License', badge_icon_url: '', sort_order: 1 },
+      { id: 2, label: 'GST Registered Business', badge_icon_url: '', sort_order: 2 },
+      { id: 3, label: 'Zero-Broker Harbour Direct', badge_icon_url: '', sort_order: 3 },
+      { id: 4, label: 'Sub-Zero Cold Chain Logistics', badge_icon_url: '', sort_order: 4 },
+      { id: 5, label: 'Vizag Health Dept Compliance', badge_icon_url: '', sort_order: 5 }
+    ];
+  },
+
+  createCertification: async (c) => {
+    const { data, error } = await supabase
+      .from('certifications')
+      .insert({ label: c.label, badge_icon_url: c.badge_icon_url || '', sort_order: parseInt(c.sort_order || 0) })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  updateCertification: async (id, c) => {
+    const updatePayload = {};
+    if (c.label !== undefined) updatePayload.label = c.label;
+    if (c.badge_icon_url !== undefined) updatePayload.badge_icon_url = c.badge_icon_url;
+    if (c.sort_order !== undefined) updatePayload.sort_order = parseInt(c.sort_order);
+
+    const { data, error } = await supabase
+      .from('certifications')
+      .update(updatePayload)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  deleteCertification: async (id) => {
+    const { error } = await supabase.from('certifications').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
+  // ---- HOW IT WORKS STEPS CMS ----
+
+  getHowItWorksSteps: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('how_it_works_steps')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('step_number', { ascending: true });
+      if (error) throw error;
+      if (data && data.length > 0) return data;
+    } catch (e) {
+      console.warn('How it works steps note:', e.message);
+    }
+    return [
+      { id: 1, step_number: 1, title: 'Harbour Landing', description: 'Our local trawlers dock daily at dawn at Visakhapatnam Fishing Harbour with freshly harvested Bay of Bengal catch.', icon_name: 'anchor', sort_order: 1 },
+      { id: 2, step_number: 2, title: 'Sorting & Flake Icing', description: 'Seafood is immediately inspected, graded by size/weight, and layered in sub-zero flake ice crates right on the dock floor.', icon_name: 'snowflake', sort_order: 2 },
+      { id: 3, step_number: 3, title: 'Cold Storage Transit', description: 'Loaded directly into temperature-monitored refrigerated transport vans within 60 minutes of dock landing.', icon_name: 'truck', sort_order: 3 },
+      { id: 4, step_number: 4, title: 'Your Doorstep Delivery', description: 'Delivered straight to your hotel, restaurant, or commercial kitchen across Vizag and AP with full invoice transparency.', icon_name: 'home', sort_order: 4 }
+    ];
+  },
+
+  createHowItWorksStep: async (s) => {
+    const { data, error } = await supabase
+      .from('how_it_works_steps')
+      .insert({
+        step_number: parseInt(s.step_number || 1),
+        title: s.title,
+        description: s.description || '',
+        icon_name: s.icon_name || 'anchor',
+        sort_order: parseInt(s.sort_order || 0)
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  updateHowItWorksStep: async (id, s) => {
+    const updatePayload = {};
+    if (s.step_number !== undefined) updatePayload.step_number = parseInt(s.step_number);
+    if (s.title !== undefined) updatePayload.title = s.title;
+    if (s.description !== undefined) updatePayload.description = s.description;
+    if (s.icon_name !== undefined) updatePayload.icon_name = s.icon_name;
+    if (s.sort_order !== undefined) updatePayload.sort_order = parseInt(s.sort_order);
+
+    const { data, error } = await supabase
+      .from('how_it_works_steps')
+      .update(updatePayload)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  deleteHowItWorksStep: async (id) => {
+    const { error } = await supabase.from('how_it_works_steps').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
+  // ---- CLIENT LOGOS CMS ----
+
+  getClientLogos: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('client_logos')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('id', { ascending: true });
+      if (error) throw error;
+      if (data && data.length > 0) return data;
+    } catch (e) {
+      console.warn('Client logos note:', e.message);
+    }
+    return [
+      { id: 1, client_name: 'Grand Coastal Hotel Vizag', logo_url: '', is_placeholder: true, sort_order: 1 },
+      { id: 2, client_name: 'Andhra Spice Restaurant Chain', logo_url: '', is_placeholder: true, sort_order: 2 },
+      { id: 3, client_name: 'Bayview Luxury Resort & Spa', logo_url: '', is_placeholder: true, sort_order: 3 },
+      { id: 4, client_name: 'Oceanic Catering Services', logo_url: '', is_placeholder: true, sort_order: 4 },
+      { id: 5, client_name: 'Vizag Seafood Distributors', logo_url: '', is_placeholder: true, sort_order: 5 }
+    ];
+  },
+
+  createClientLogo: async (c) => {
+    const { data, error } = await supabase
+      .from('client_logos')
+      .insert({
+        client_name: c.client_name,
+        logo_url: c.logo_url || '',
+        is_placeholder: c.is_placeholder !== undefined ? c.is_placeholder : true,
+        sort_order: parseInt(c.sort_order || 0)
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  updateClientLogo: async (id, c) => {
+    const updatePayload = {};
+    if (c.client_name !== undefined) updatePayload.client_name = c.client_name;
+    if (c.logo_url !== undefined) updatePayload.logo_url = c.logo_url;
+    if (c.is_placeholder !== undefined) updatePayload.is_placeholder = c.is_placeholder;
+    if (c.sort_order !== undefined) updatePayload.sort_order = parseInt(c.sort_order);
+
+    const { data, error } = await supabase
+      .from('client_logos')
+      .update(updatePayload)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  deleteClientLogo: async (id) => {
+    const { error } = await supabase.from('client_logos').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
   // ---- SITE SETTINGS CMS ----
 
   getSiteSettings: async () => {
     const defaults = {
-      hero_title: "Fresh From Vizag's Waters To Your Business",
-      hero_subtitle: 'Direct-from-ocean bulk seafood supply. Zero middleman markups, transparent daily pricing in Indian Rupees (₹), and temperature-controlled container logistics for luxury hotels, restaurant chains, exporters, and regional distributors nationwide.',
-      stat_1_num: '10K+',
-      stat_1_label: 'KG Daily',
+      hero_title: "Visakhapatnam's Most Trusted Direct Seafood Partner",
+      hero_subtitle: "Direct-from-harbour bulk seafood supply for hotels, restaurant chains, caterers, and regional distributors across Andhra Pradesh. Zero middleman markups, transparent daily pricing in Indian Rupees (₹), and temperature-controlled local logistics.",
+      stat_1_num: '10,000+',
+      stat_1_label: 'KG Daily Catch',
       stat_2_num: '100%',
-      stat_2_label: 'Vizag Coast',
+      stat_2_label: 'Direct Harbour Sourced',
       stat_3_num: '0%',
-      stat_3_label: 'Middlemen',
+      stat_3_label: 'Middlemen Markups',
+      stat_4_num: '18+',
+      stat_4_label: 'Years Serving Vizag',
+      founder_story_title: "From Vizag Harbour Docks to Andhra's Finest Tables",
+      founder_story_body: "Founded over 18 years ago at the historic Visakhapatnam Fishing Harbour, AJM Fisheries began with a single trawler and a firm belief: local businesses deserve fresh, unadulterated seafood straight from the harbour floor without paying inflated middleman commissions. Today, we directly serve top culinary institutions, luxury resorts, and high-volume dining establishments across Andhra Pradesh with daily temperature-guaranteed deliveries.",
+      founder_name: 'A.J. Mohan & Sons',
+      founder_since_year: 'Est. 2008',
+      founder_story_image_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=85',
+      about_section_eyebrow: 'DIRECT DOCK OPERATIONS',
+      about_section_title: 'The Visakhapatnam Advantage: Freshness Measured in Hours, Not Days',
+      about_section_body_1: 'Located right at the Visakhapatnam Fishing Harbour, our dockside processing facility receives catches straight off local trawlers at dawn. Every specimen is inspected, cleaned, size-graded, and iced immediately to lock in ocean freshness.',
+      about_section_body_2: 'By eliminating multi-layer wholesale brokers, we give Vizag and Andhra Pradesh chefs guaranteed cold-chain integrity, dependable supply consistency, and honest harbour-direct pricing in INR.',
+      how_it_works_eyebrow: 'OUR DIRECT SUPPLY CHAIN',
+      how_it_works_title: 'From Harbour Dock to Your Kitchen in 4 Seamless Steps',
+      how_it_works_subtitle: 'Experience an uninterrupted cold chain designed specifically for commercial hospitality and food service buyers.',
+      closing_cta_headline: "Ready for Direct-from-Harbour Seafood Supply?",
+      closing_cta_body: "Join Visakhapatnam's leading hotels, restaurants, and caterers who rely on AJM Fisheries for daily fresh catch, transparent pricing, and guaranteed delivery.",
+      closing_cta_button_text: "View Today's Local Rates",
       footer_phone: '+91 891 255 1204',
-      footer_email: 'bulk@ajmfisheries.com',
+      footer_email: 'wholesale@ajmfisheries.com',
       footer_gstin: '37AAHCA8492K1Z9',
-      footer_address: 'Vizag Fishing Harbour, Visakhapatnam, 530001, AP, India'
+      footer_address: 'Dockside Gate 4, Vizag Fishing Harbour, Visakhapatnam, 530001, AP, India'
     };
 
     try {
@@ -417,3 +612,4 @@ export const api = {
     return data;
   }
 };
+

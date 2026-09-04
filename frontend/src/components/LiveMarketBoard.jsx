@@ -171,7 +171,7 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
       )}
       
       <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', fontSize: '0.82rem', color: 'var(--text-dark-secondary)' }}>
-        <strong>B2B Maritime Distribution Terms:</strong> Net wholesale prices subject to dock volume availability. Cargo is shock-frozen and packed into temperature-controlled containers at Visakhapatnam Fishing Harbour.
+        <strong>B2B Wholesale Supply Terms:</strong> Net wholesale prices subject to dock landing volume availability. Orders are flake-iced and packed in temperature-controlled crates directly at Visakhapatnam Fishing Harbour.
       </div>
     </div>
   );

@@ -105,11 +105,14 @@ export default function Navigation({ user, currentView, onViewChange, onOpenAuth
           <button className="navbar-link" onClick={() => scrollToSection('about-section')}>
             About Us
           </button>
-          <button className="navbar-link" onClick={() => scrollToSection('why-us-section')}>
-            Why Choose Us
+          <button className="navbar-link" onClick={() => scrollToSection('founder-story')}>
+            Our Story
+          </button>
+          <button className="navbar-link" onClick={() => scrollToSection('how-it-works-journey')}>
+            How It Works
           </button>
           <button className="navbar-link" onClick={() => scrollToSection('rates-ticker')}>
-            Live Rates
+            Daily Rates
           </button>
           <button className="navbar-link" onClick={() => scrollToSection('contact-section')}>
             Contact
@@ -152,7 +155,7 @@ export default function Navigation({ user, currentView, onViewChange, onOpenAuth
             </div>
           ) : (
             <button className="btn btn-primary" onClick={() => { closeMobileMenu(); onOpenAuth(false); }} style={{ padding: '0.55rem 1.35rem', fontSize: '0.85rem' }}>
-              Browse Bulk Catch
+              View Today's Rates
             </button>
           )}
 

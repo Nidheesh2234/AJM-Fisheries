@@ -11,6 +11,9 @@ export default function AdminDashboard({ user }) {
   const [testimonials, setTestimonials] = useState([]);
   const [partnerCards, setPartnerCards] = useState([]);
   const [valueCards, setValueCards] = useState([]);
+  const [certifications, setCertifications] = useState([]);
+  const [howItWorksSteps, setHowItWorksSteps] = useState([]);
+  const [clientLogos, setClientLogos] = useState([]);
   const [siteSettings, setSiteSettings] = useState({});
 
   // Loading & status
@@ -54,6 +57,24 @@ export default function AdminDashboard({ user }) {
   const [valueImageUrl, setValueImageUrl] = useState('');
   const [editingValueId, setEditingValueId] = useState(null);
 
+  // Certifications Form
+  const [certLabel, setCertLabel] = useState('');
+  const [certBadgeIconUrl, setCertBadgeIconUrl] = useState('');
+  const [editingCertId, setEditingCertId] = useState(null);
+
+  // How It Works Steps Form
+  const [stepNum, setStepNum] = useState('1');
+  const [stepTitle, setStepTitle] = useState('');
+  const [stepDesc, setStepDesc] = useState('');
+  const [stepIconName, setStepIconName] = useState('anchor');
+  const [editingStepId, setEditingStepId] = useState(null);
+
+  // Client Logos Form
+  const [clientName, setClientName] = useState('');
+  const [clientLogoUrl, setClientLogoUrl] = useState('');
+  const [clientIsPlaceholder, setClientIsPlaceholder] = useState(true);
+  const [editingClientId, setEditingClientId] = useState(null);
+
   // Site Settings Form
   const [settingsForm, setSettingsForm] = useState({});
 
@@ -79,6 +100,15 @@ export default function AdminDashboard({ user }) {
       } else if (activeTab === 'values') {
         const data = await api.getValueCards();
         setValueCards(data || []);
+      } else if (activeTab === 'certifications') {
+        const data = await api.getCertifications();
+        setCertifications(data || []);
+      } else if (activeTab === 'how_it_works') {
+        const data = await api.getHowItWorksSteps();
+        setHowItWorksSteps(data || []);
+      } else if (activeTab === 'client_logos') {
+        const data = await api.getClientLogos();
+        setClientLogos(data || []);
       } else if (activeTab === 'settings') {
         const data = await api.getSiteSettings();
         setSiteSettings(data || {});
@@ -96,6 +126,7 @@ export default function AdminDashboard({ user }) {
       loadData();
     }
   }, [activeTab, user]);
+
 
   if (!user || user.role !== 'admin') {
     return (
@@ -312,14 +343,118 @@ export default function AdminDashboard({ user }) {
     setValueImageUrl(item.image_url || '');
   };
 
-  // ---- 6. SITE SETTINGS CMS ----
+  // ---- 6. CERTIFICATIONS CMS ----
+  const handleSaveCertification = async (e) => {
+    e.preventDefault();
+    setError(''); setSuccess('');
+    if (!certLabel.trim()) { setError('Badge label is required.'); return; }
+    setSubmitting(true);
+    try {
+      if (editingCertId) {
+        await api.updateCertification(editingCertId, { label: certLabel, badge_icon_url: certBadgeIconUrl });
+        setSuccess('Certification badge updated successfully.');
+        setEditingCertId(null);
+      } else {
+        await api.createCertification({ label: certLabel, badge_icon_url: certBadgeIconUrl, sort_order: certifications.length + 1 });
+        setSuccess('Added new trust certification badge.');
+      }
+      setCertLabel(''); setCertBadgeIconUrl('');
+      loadData();
+    } catch (err) { setError(err.message || 'Failed to save certification.'); }
+    finally { setSubmitting(false); }
+  };
+
+  const startEditCert = (item) => {
+    setEditingCertId(item.id);
+    setCertLabel(item.label);
+    setCertBadgeIconUrl(item.badge_icon_url || '');
+  };
+
+  // ---- 7. HOW IT WORKS STEPS CMS ----
+  const handleSaveHowItWorksStep = async (e) => {
+    e.preventDefault();
+    setError(''); setSuccess('');
+    if (!stepTitle.trim()) { setError('Step title is required.'); return; }
+    setSubmitting(true);
+    try {
+      if (editingStepId) {
+        await api.updateHowItWorksStep(editingStepId, {
+          step_number: stepNum,
+          title: stepTitle,
+          description: stepDesc,
+          icon_name: stepIconName
+        });
+        setSuccess('Journey step updated successfully.');
+        setEditingStepId(null);
+      } else {
+        await api.createHowItWorksStep({
+          step_number: stepNum,
+          title: stepTitle,
+          description: stepDesc,
+          icon_name: stepIconName,
+          sort_order: howItWorksSteps.length + 1
+        });
+        setSuccess('Added new How It Works supply chain step.');
+      }
+      setStepTitle(''); setStepDesc(''); setStepNum((howItWorksSteps.length + 2).toString()); setStepIconName('anchor');
+      loadData();
+    } catch (err) { setError(err.message || 'Failed to save step.'); }
+    finally { setSubmitting(false); }
+  };
+
+  const startEditStep = (item) => {
+    setEditingStepId(item.id);
+    setStepNum(item.step_number ? item.step_number.toString() : '1');
+    setStepTitle(item.title);
+    setStepDesc(item.description || '');
+    setStepIconName(item.icon_name || 'anchor');
+  };
+
+  // ---- 8. CLIENT LOGOS CMS ----
+  const handleSaveClientLogo = async (e) => {
+    e.preventDefault();
+    setError(''); setSuccess('');
+    if (!clientName.trim()) { setError('Client name is required.'); return; }
+    setSubmitting(true);
+    try {
+      if (editingClientId) {
+        await api.updateClientLogo(editingClientId, {
+          client_name: clientName,
+          logo_url: clientLogoUrl,
+          is_placeholder: clientIsPlaceholder
+        });
+        setSuccess('Client logo badge updated.');
+        setEditingClientId(null);
+      } else {
+        await api.createClientLogo({
+          client_name: clientName,
+          logo_url: clientLogoUrl,
+          is_placeholder: clientIsPlaceholder,
+          sort_order: clientLogos.length + 1
+        });
+        setSuccess('Added new client trust badge.');
+      }
+      setClientName(''); setClientLogoUrl(''); setClientIsPlaceholder(true);
+      loadData();
+    } catch (err) { setError(err.message || 'Failed to save client logo.'); }
+    finally { setSubmitting(false); }
+  };
+
+  const startEditClientLogo = (item) => {
+    setEditingClientId(item.id);
+    setClientName(item.client_name);
+    setClientLogoUrl(item.logo_url || '');
+    setClientIsPlaceholder(item.is_placeholder !== undefined ? item.is_placeholder : true);
+  };
+
+  // ---- 9. SITE SETTINGS CMS ----
   const handleSaveSiteSettings = async (e) => {
     e.preventDefault();
     setError(''); setSuccess('');
     setSubmitting(true);
     try {
       await api.updateSiteSettings(settingsForm);
-      setSuccess('Site content settings and stat blocks saved successfully!');
+      setSuccess('Site content settings and section blocks saved successfully!');
       setSiteSettings(settingsForm);
     } catch (err) { setError(err.message || 'Failed to update site settings.'); }
     finally { setSubmitting(false); }
@@ -334,6 +469,9 @@ export default function AdminDashboard({ user }) {
       else if (type === 'testimonial') await api.deleteTestimonial(id);
       else if (type === 'partner') await api.deletePartnerCard(id);
       else if (type === 'value') await api.deleteValueCard(id);
+      else if (type === 'certification') await api.deleteCertification(id);
+      else if (type === 'how_it_works') await api.deleteHowItWorksStep(id);
+      else if (type === 'client_logo') await api.deleteClientLogo(id);
       
       setSuccess('Item removed successfully.');
       setDeleteModal({ open: false, type: '', id: null, name: '' });
@@ -351,7 +489,7 @@ export default function AdminDashboard({ user }) {
       {/* CMS Sub-navigation Tabs */}
       <div className="auth-tabs" style={{ gap: '0.25rem', borderBottom: '1px solid var(--color-border-gold)', paddingBottom: '0.25rem' }}>
         <div className={`auth-tab ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>
-          Live Rates Board
+          Live Rates
         </div>
         <div className={`auth-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
           Orders ({orders.filter(o => o.status === 'Pending').length})
@@ -363,7 +501,16 @@ export default function AdminDashboard({ user }) {
           Partners
         </div>
         <div className={`auth-tab ${activeTab === 'values' ? 'active' : ''}`} onClick={() => setActiveTab('values')}>
-          Logistics Cards
+          Value Cards
+        </div>
+        <div className={`auth-tab ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>
+          Certifications
+        </div>
+        <div className={`auth-tab ${activeTab === 'how_it_works' ? 'active' : ''}`} onClick={() => setActiveTab('how_it_works')}>
+          How It Works
+        </div>
+        <div className={`auth-tab ${activeTab === 'client_logos' ? 'active' : ''}`} onClick={() => setActiveTab('client_logos')}>
+          Client Badges
         </div>
         <div className={`auth-tab ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
           Site Content
@@ -372,6 +519,7 @@ export default function AdminDashboard({ user }) {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
 
       {/* ============================================================
           1. LIVE RATES / INVENTORY CMS
@@ -737,16 +885,197 @@ export default function AdminDashboard({ user }) {
       )}
 
       {/* ============================================================
-          6. SITE SETTINGS & STAT BLOCKS CMS
+          6. CERTIFICATIONS CMS
+         ============================================================ */}
+      {activeTab === 'certifications' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div className="card">
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>
+              {editingCertId ? 'Edit Trust Certification' : '+ Add Trust Certification'}
+            </h3>
+            <form onSubmit={handleSaveCertification} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="form-group">
+                <label className="form-label">Badge Label</label>
+                <input type="text" className="form-input" placeholder="e.g. FSSAI Wholesale License" value={certLabel} onChange={(e) => setCertLabel(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Badge Icon Image URL or Upload (Optional)</label>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input type="url" className="form-input" placeholder="https://..." value={certBadgeIconUrl} onChange={(e) => setCertBadgeIconUrl(e.target.value)} style={{ flex: '1 1 200px' }} />
+                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: '1 1 180px', padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setCertBadgeIconUrl)} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 140px' }} disabled={submitting}>
+                  {editingCertId ? 'Update Badge' : '+ Add Badge'}
+                </button>
+                {editingCertId && (
+                  <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={() => { setEditingCertId(null); setCertLabel(''); setCertBadgeIconUrl(''); }}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+
+          <div className="card">
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Trust Badges & Certifications</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {certifications.map(c => (
+                <div key={c.id} style={{ padding: '1rem 1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    {c.badge_icon_url ? (
+                      <img src={c.badge_icon_url} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%' }} />
+                    ) : (
+                      <span style={{ color: 'var(--color-gold)', fontSize: '1.2rem' }}>🛡️</span>
+                    )}
+                    <strong style={{ fontSize: '0.95rem' }}>{c.label}</strong>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="btn btn-outline-navy" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => startEditCert(c)}>Edit</button>
+                    <button className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => setDeleteModal({ open: true, type: 'certification', id: c.id, name: c.label })}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          7. HOW IT WORKS STEPS CMS
+         ============================================================ */}
+      {activeTab === 'how_it_works' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div className="card">
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>
+              {editingStepId ? 'Edit Supply Chain Step' : '+ Add Supply Chain Step'}
+            </h3>
+            <form onSubmit={handleSaveHowItWorksStep} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Step Number</label>
+                  <input type="number" className="form-input" value={stepNum} onChange={(e) => setStepNum(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Icon Type</label>
+                  <select className="form-input" value={stepIconName} onChange={(e) => setStepIconName(e.target.value)}>
+                    <option value="anchor">Anchor (Harbour)</option>
+                    <option value="snowflake">Snowflake (Flake Ice)</option>
+                    <option value="truck">Truck (Cold Transport)</option>
+                    <option value="home">Kitchen / Doorstep</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Step Title</label>
+                <input type="text" className="form-input" placeholder="e.g. Harbour Landing" value={stepTitle} onChange={(e) => setStepTitle(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Step Description</label>
+                <textarea className="form-input" rows="2" placeholder="Detail how this step maintains quality..." value={stepDesc} onChange={(e) => setStepDesc(e.target.value)} />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 140px' }} disabled={submitting}>
+                  {editingStepId ? 'Update Step' : '+ Add Step'}
+                </button>
+                {editingStepId && (
+                  <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={() => { setEditingStepId(null); setStepTitle(''); setStepDesc(''); }}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+
+          <div className="card">
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>How It Works Journey Steps</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
+              {howItWorksSteps.map(s => (
+                <div key={s.id} style={{ padding: '1.25rem', background: 'var(--bg-ivory)', border: '1px solid var(--color-border-gold)', borderRadius: 'var(--border-radius-md)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <span style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--bg-navy-deep)', color: 'var(--color-gold)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                      {s.step_number}
+                    </span>
+                    <div style={{ display: 'flex', gap: '0.3rem' }}>
+                      <button className="btn btn-outline-navy" style={{ padding: '0.2rem 0.4rem', fontSize: '0.7rem', minHeight: '30px' }} onClick={() => startEditStep(s)}>Edit</button>
+                      <button className="btn btn-danger" style={{ padding: '0.2rem 0.4rem', fontSize: '0.7rem', minHeight: '30px' }} onClick={() => setDeleteModal({ open: true, type: 'how_it_works', id: s.id, name: s.title })}>Delete</button>
+                    </div>
+                  </div>
+                  <h4 style={{ fontSize: '1rem', marginBottom: '0.35rem' }}>{s.title}</h4>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-dark-secondary)' }}>{s.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          8. CLIENT BADGES CMS
+         ============================================================ */}
+      {activeTab === 'client_logos' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div className="card">
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>
+              {editingClientId ? 'Edit Client Trust Badge' : '+ Add Client Trust Badge'}
+            </h3>
+            <form onSubmit={handleSaveClientLogo} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="form-group">
+                <label className="form-label">Client / Partner Name</label>
+                <input type="text" className="form-input" placeholder="e.g. Grand Coastal Hotel Vizag" value={clientName} onChange={(e) => setClientName(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Logo Image URL or Upload (Optional)</label>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input type="url" className="form-input" placeholder="https://..." value={clientLogoUrl} onChange={(e) => setClientLogoUrl(e.target.value)} style={{ flex: '1 1 200px' }} />
+                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: '1 1 180px', padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, setClientLogoUrl)} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: '1 1 140px' }} disabled={submitting}>
+                  {editingClientId ? 'Update Badge' : '+ Add Badge'}
+                </button>
+                {editingClientId && (
+                  <button type="button" className="btn btn-outline-navy" style={{ flex: '1 1 100px' }} onClick={() => { setEditingClientId(null); setClientName(''); setClientLogoUrl(''); }}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+
+          <div className="card">
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Client Trust Badges</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              {clientLogos.map(c => (
+                <div key={c.id} style={{ padding: '1rem', background: 'var(--bg-ivory)', border: '1px dashed var(--color-border-gold)', borderRadius: 'var(--border-radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong style={{ fontSize: '0.9rem', display: 'block' }}>{c.client_name}</strong>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-gold)' }}>Vizag Partner</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.3rem' }}>
+                    <button className="btn btn-outline-navy" style={{ padding: '0.2rem 0.4rem', fontSize: '0.7rem', minHeight: '30px' }} onClick={() => startEditClientLogo(c)}>Edit</button>
+                    <button className="btn btn-danger" style={{ padding: '0.2rem 0.4rem', fontSize: '0.7rem', minHeight: '30px' }} onClick={() => setDeleteModal({ open: true, type: 'client_logo', id: c.id, name: c.client_name })}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          9. SITE SETTINGS & SECTION CONTENT CMS
          ============================================================ */}
       {activeTab === 'settings' && (
         <div className="card">
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Site Content & Stat Blocks Manager</h3>
+          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.25rem', fontFamily: 'var(--font-serif)' }}>Site Section Content Manager</h3>
           <form onSubmit={handleSaveSiteSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             
             {/* Hero Section Content */}
             <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
-              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>Hero Section Typography</h4>
+              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>1. Hero Section Typography</h4>
               <div className="form-group">
                 <label className="form-label">Hero Main Title</label>
                 <input type="text" className="form-input" value={settingsForm.hero_title || ''} onChange={(e) => setSettingsForm({ ...settingsForm, hero_title: e.target.value })} required />
@@ -757,10 +1086,40 @@ export default function AdminDashboard({ user }) {
               </div>
             </div>
 
+            {/* Founder Story Content */}
+            <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
+              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>2. Founder & Heritage Story Section</h4>
+              <div className="form-group">
+                <label className="form-label">Founder Section Headline</label>
+                <input type="text" className="form-input" value={settingsForm.founder_story_title || ''} onChange={(e) => setSettingsForm({ ...settingsForm, founder_story_title: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Founder Story Body</label>
+                <textarea className="form-input" rows="4" value={settingsForm.founder_story_body || ''} onChange={(e) => setSettingsForm({ ...settingsForm, founder_story_body: e.target.value })} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                <div>
+                  <label className="form-label">Founder / Business Name</label>
+                  <input type="text" className="form-input" value={settingsForm.founder_name || ''} onChange={(e) => setSettingsForm({ ...settingsForm, founder_name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="form-label">Established Year</label>
+                  <input type="text" className="form-input" value={settingsForm.founder_since_year || ''} onChange={(e) => setSettingsForm({ ...settingsForm, founder_since_year: e.target.value })} />
+                </div>
+              </div>
+              <div className="form-group" style={{ marginTop: '1rem', marginBottom: 0 }}>
+                <label className="form-label">Founder Photo Image URL or Upload</label>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input type="url" className="form-input" value={settingsForm.founder_story_image_url || ''} onChange={(e) => setSettingsForm({ ...settingsForm, founder_story_image_url: e.target.value })} style={{ flex: '1 1 200px' }} />
+                  <input type="file" accept="image/*" className="btn btn-outline-navy" style={{ flex: '1 1 180px', padding: '0.5rem' }} onChange={(e) => handleImageFileChange(e, (url) => setSettingsForm({ ...settingsForm, founder_story_image_url: url }))} />
+                </div>
+              </div>
+            </div>
+
             {/* Stat Blocks */}
             <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
-              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>Stats Cards (Home Page)</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
+              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>3. Stats Cards (4 Counter Blocks)</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                 <div>
                   <label className="form-label">Stat 1 Value</label>
                   <input type="text" className="form-input" value={settingsForm.stat_1_num || ''} onChange={(e) => setSettingsForm({ ...settingsForm, stat_1_num: e.target.value })} />
@@ -779,12 +1138,35 @@ export default function AdminDashboard({ user }) {
                   <label className="form-label" style={{ marginTop: '0.4rem' }}>Stat 3 Label</label>
                   <input type="text" className="form-input" value={settingsForm.stat_3_label || ''} onChange={(e) => setSettingsForm({ ...settingsForm, stat_3_label: e.target.value })} />
                 </div>
+                <div>
+                  <label className="form-label">Stat 4 Value</label>
+                  <input type="text" className="form-input" value={settingsForm.stat_4_num || ''} onChange={(e) => setSettingsForm({ ...settingsForm, stat_4_num: e.target.value })} />
+                  <label className="form-label" style={{ marginTop: '0.4rem' }}>Stat 4 Label</label>
+                  <input type="text" className="form-input" value={settingsForm.stat_4_label || ''} onChange={(e) => setSettingsForm({ ...settingsForm, stat_4_label: e.target.value })} />
+                </div>
+              </div>
+            </div>
+
+            {/* Closing CTA Banner Settings */}
+            <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
+              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>4. Closing CTA Section</h4>
+              <div className="form-group">
+                <label className="form-label">CTA Headline</label>
+                <input type="text" className="form-input" value={settingsForm.closing_cta_headline || ''} onChange={(e) => setSettingsForm({ ...settingsForm, closing_cta_headline: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">CTA Body Description</label>
+                <textarea className="form-input" rows="2" value={settingsForm.closing_cta_body || ''} onChange={(e) => setSettingsForm({ ...settingsForm, closing_cta_body: e.target.value })} />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Button Action Text</label>
+                <input type="text" className="form-input" value={settingsForm.closing_cta_button_text || ''} onChange={(e) => setSettingsForm({ ...settingsForm, closing_cta_button_text: e.target.value })} />
               </div>
             </div>
 
             {/* Footer & Contact Settings */}
             <div style={{ background: 'var(--bg-ivory)', padding: '1.25rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-gold)' }}>
-              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>Footer & Corporate Contact Info</h4>
+              <h4 style={{ fontSize: '1rem', color: 'var(--color-gold)', marginBottom: '0.85rem' }}>5. Footer & Business Compliance Info</h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                 <div className="form-group">
                   <label className="form-label">Phone Desk</label>
@@ -806,7 +1188,7 @@ export default function AdminDashboard({ user }) {
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ padding: '0.85rem', fontSize: '1rem' }} disabled={submitting}>
-              {submitting ? 'Saving Settings...' : 'Save Site Settings'}
+              {submitting ? 'Saving Settings...' : 'Save All Site Content'}
             </button>
           </form>
         </div>
@@ -824,3 +1206,4 @@ export default function AdminDashboard({ user }) {
     </div>
   );
 }
+

@@ -157,13 +157,13 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
   const estimatedTotal = calculateTotal();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', paddingTop: '2rem', paddingBottom: '3rem' }}>
       
       {/* Ordering Form Card */}
       <div className="card">
         <h2 style={{ fontSize: '1.5rem', marginBottom: '0.35rem', fontFamily: 'var(--font-serif)' }}>Bulk Ordering Portal</h2>
         <p style={{ color: 'var(--text-dark-secondary)', fontSize: '0.88rem', marginBottom: '1.75rem' }}>
-          Execute wholesale procurement contracts directly into our Vizag cargo logistics ledger.
+          Execute wholesale procurement contracts directly into our Vizag harbour logistics ledger.
         </p>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -171,7 +171,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
 
         {inventoryLoading ? (
           <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-dark-secondary)' }}>
-            <p>Analyzing current cargo holds and harbor metrics...</p>
+            <p>Checking current harbour stocks and dock landing metrics...</p>
           </div>
         ) : inventory.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--color-coral)' }}>
@@ -310,11 +310,11 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
               <thead>
                 <tr>
                   <th>Order Ref</th>
-                  <th>Cargo Sourced</th>
-                  <th>Delivery Port Destination</th>
+                  <th>Seafood Sourced</th>
+                  <th>Delivery Location</th>
                   <th>Status</th>
                   <th>Coordinates</th>
-                  <th>Freight Transit Tracker</th>
+                  <th>Delivery Tracker</th>
                 </tr>
               </thead>
               <tbody>
@@ -381,7 +381,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                             }}
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                            Track Cargo ↗
+                            Track Delivery ↗
                           </a>
                         ) : (
                           <span style={{ fontSize: '0.78rem', color: 'var(--text-dark-secondary)', fontStyle: 'italic' }}>

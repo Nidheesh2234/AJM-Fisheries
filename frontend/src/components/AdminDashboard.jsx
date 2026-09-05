@@ -638,27 +638,27 @@ export default function AdminDashboard({ user }) {
                   <tbody>
                     {inventory.map((item, idx) => (
                       <tr key={item.id}>
-                        <td style={{ width: '60px' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                            <button className="btn btn-outline-navy" style={{ padding: '0.15rem 0.35rem', fontSize: '0.75rem', minHeight: '28px' }} disabled={idx === 0} onClick={() => handleMoveInventory(idx, -1)}>▲</button>
-                            <button className="btn btn-outline-navy" style={{ padding: '0.15rem 0.35rem', fontSize: '0.75rem', minHeight: '28px' }} disabled={idx === inventory.length - 1} onClick={() => handleMoveInventory(idx, 1)}>▼</button>
+                        <td data-label="Reorder" style={{ width: '60px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'row', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                            <button className="btn btn-outline-navy" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', minHeight: '36px', minWidth: '36px' }} disabled={idx === 0} onClick={() => handleMoveInventory(idx, -1)}>▲</button>
+                            <button className="btn btn-outline-navy" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', minHeight: '36px', minWidth: '36px' }} disabled={idx === inventory.length - 1} onClick={() => handleMoveInventory(idx, 1)}>▼</button>
                           </div>
                         </td>
-                        <td>
+                        <td data-label="Thumbnail">
                           {item.image_url ? (
                             <img src={item.image_url} alt={item.species} style={{ width: '44px', height: '44px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--color-border-gold)' }} />
                           ) : (
                             <div style={{ width: '44px', height: '44px', borderRadius: '8px', background: 'rgba(201, 166, 91, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-gold)' }}>🐟</div>
                           )}
                         </td>
-                        <td>
+                        <td data-label="Species">
                           <div className="fish-name">{item.species}</div>
                           {item.local_name && <div style={{ fontSize: '0.78rem', color: 'var(--color-gold)' }}>{item.local_name}</div>}
                         </td>
-                        <td>{item.category || 'Fish'}</td>
-                        <td><span className="fish-price">₹{parseFloat(item.current_price_inr || 0).toFixed(2)}</span> /{item.unit || 'kg'}</td>
-                        <td><span className={`badge ${item.status === 'Available' ? 'badge-available' : 'badge-outofstock'}`}>{item.status}</span></td>
-                        <td style={{ textAlign: 'right' }}>
+                        <td data-label="Category">{item.category || 'Fish'}</td>
+                        <td data-label="Price"><span className="fish-price">₹{parseFloat(item.current_price_inr || 0).toFixed(2)}</span> /{item.unit || 'kg'}</td>
+                        <td data-label="Status"><span className={`badge ${item.status === 'Available' ? 'badge-available' : 'badge-outofstock'}`}>{item.status}</span></td>
+                        <td data-label="Actions" style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
                             <button className="btn btn-outline-navy" style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => startEditInv(item)}>Edit</button>
                             <button className="btn btn-danger" style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', minHeight: '36px' }} onClick={() => setDeleteModal({ open: true, type: 'inventory', id: item.id, name: item.species })}>Delete</button>
@@ -701,24 +701,24 @@ export default function AdminDashboard({ user }) {
                 <tbody>
                   {orders.map((order) => (
                     <tr key={order.id}>
-                      <td style={{ fontWeight: '700', fontFamily: 'var(--font-mono)' }}>{order.order_ref || `AJM-ORD-${order.id}`}</td>
-                      <td>{order.customer_name || 'B2B Buyer'}</td>
-                      <td>
+                      <td data-label="Order Ref" style={{ fontWeight: '700', fontFamily: 'var(--font-mono)' }}>{order.order_ref || `AJM-ORD-${order.id}`}</td>
+                      <td data-label="Customer">{order.customer_name || 'B2B Buyer'}</td>
+                      <td data-label="Cargo Sourced">
                         <div style={{ fontWeight: '600', color: 'var(--color-gold)' }}>{order.quantity} {order.quantity_unit} of {order.fish_type}</div>
                         <div>Value: ₹{parseFloat(order.total_price_inr || 0).toLocaleString('en-IN')}</div>
                       </td>
-                      <td style={{ maxWidth: '180px' }}>{order.delivery_location}</td>
-                      <td>
+                      <td data-label="Destination" style={{ maxWidth: '180px' }}>{order.delivery_location}</td>
+                      <td data-label="Coordinates">
                         {order.google_maps_link ? <a href={order.google_maps_link} target="_blank" rel="noopener noreferrer" className="btn btn-outline-navy" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }}>Map Link ↗</a> : 'N/A'}
                       </td>
-                      <td style={{ minWidth: '200px' }}>
+                      <td data-label="Tracking Link" style={{ minWidth: '200px' }}>
                         <div style={{ display: 'flex', gap: '0.25rem' }}>
                           <input type="text" className="form-input" placeholder="Paste tracking link" value={trackingInputs[order.id] || ''} onChange={(e) => setTrackingInputs({ ...trackingInputs, [order.id]: e.target.value })} style={{ fontSize: '0.75rem', padding: '0.2rem 0.4rem', height: '36px', minHeight: '36px' }} />
                           <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', height: '36px', minHeight: '36px' }} onClick={() => handleSaveTracking(order.id)}>Save</button>
                         </div>
                       </td>
-                      <td>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '130px' }}>
+                      <td data-label="Status Action">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%', maxWidth: '130px', marginLeft: 'auto' }}>
                           <span className={`badge badge-${(order.status || 'pending').toLowerCase()}`}>{order.status}</span>
                           {order.status === 'Pending' && <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }} onClick={() => handleStatusChange(order.id, 'Dispatched')}>Mark Dispatched</button>}
                           {order.status === 'Dispatched' && <button className="btn btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', minHeight: '32px' }} onClick={() => handleStatusChange(order.id, 'Delivered')}>Mark Delivered</button>}

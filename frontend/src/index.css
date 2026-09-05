@@ -1221,24 +1221,103 @@ a:hover { color: var(--color-gold-hover); }
 }
 
 /* =============================
-   RESPONSIVE OVERRIDES FOR NEW SECTIONS
+   RESPONSIVE OVERRIDES FOR NEW SECTIONS & MOBILE POLISH
    ============================= */
+html, body, #root, .app-container {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 @media (max-width: 1024px) {
   .journey-steps-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-  .journey-track-line, .journey-swimming-fish { display: none; }
   .stats-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
   .split-layout { grid-template-columns: 1fr; gap: 2.5rem; }
 }
 
 @media (max-width: 768px) {
-  .hero-fullbleed { padding: 6rem 1.25rem 5rem; }
-  .stats-fullbleed { padding: 3.5rem 1rem; }
+  .hero-fullbleed { padding: 5.5rem 1.25rem 4rem; }
+  .hero-title { font-size: clamp(1.6rem, 7vw, 2.4rem); line-height: 1.25; }
+  .hero-subtitle { font-size: 0.9rem; line-height: 1.6; }
+  .hero-ctas { flex-direction: column; width: 100%; gap: 0.75rem; }
+  .hero-ctas .btn { width: 100%; min-height: 48px; justify-content: center; }
+
+  .stats-fullbleed { padding: 3rem 1rem; }
   .stats-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
-  .founder-section { padding: 2rem 1.5rem; }
-  .journey-steps-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-  .closing-cta-fullbleed { padding: 4.5rem 1.25rem; }
-  .certifications-container { gap: 0.75rem; }
-  .certification-badge-card { padding: 0.65rem 1.1rem; font-size: 0.8rem; }
+  
+  /* Founder / Story split layout stacking on mobile */
+  .founder-section { padding: 2rem 1.25rem; }
+  #founder-story .split-layout-reverse { display: flex; flex-direction: column; }
+  #founder-story .split-image-wrap { width: 100%; max-height: 280px; order: 1; }
+  #founder-story .split-content { order: 2; margin-top: 1.25rem; }
+  #founder-story .split-img { width: 100%; height: 260px; object-fit: cover; border-radius: var(--border-radius-lg); }
+
+  /* How-It-Works vertical timeline on mobile */
+  .journey-wrapper { position: relative; padding-left: 2rem; }
+  .journey-track-line { display: block !important; position: absolute; left: 16px; top: 10px; bottom: 10px; width: 3px; background: rgba(201, 166, 91, 0.3); border-radius: 2px; }
+  .journey-swimming-fish { display: block !important; position: absolute; left: 6px; top: 0; transform: rotate(90deg); width: 24px; height: 24px; color: var(--color-gold); transition: transform 0.1s ease-out; }
+  .journey-steps-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+  .journey-step-card { width: 100%; text-align: left; margin: 0; }
+
+  /* Certifications 2-column grid on mobile */
+  .certifications-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; width: 100%; }
+  .certification-badge-card { justify-content: center; width: 100%; text-align: center; padding: 0.65rem 0.85rem; font-size: 0.8rem; }
+
+  /* Client Logos horizontal scroll snap on mobile */
+  .client-logos-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; gap: 1rem; padding-bottom: 0.6rem; flex-wrap: nowrap; }
+  .client-logo-item { flex: 0 0 auto; scroll-snap-align: start; min-width: 150px; }
+
+  /* Closing CTA full-width stack */
+  .closing-cta-fullbleed { padding: 4rem 1.25rem; }
+  .closing-cta-content h2 { font-size: clamp(1.4rem, 6vw, 2.2rem); }
+  .closing-cta-content button { width: 100%; min-height: 48px; }
+
+  /* Mobile Table Card Reflow (Label: Value pairs) */
+  .market-table, .market-table thead, .market-table tbody, .market-table th, .market-table td, .market-table tr {
+    display: block;
+  }
+  .market-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  .market-table tr {
+    background: var(--bg-ivory-card);
+    border: 1px solid var(--color-border-gold);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+  .market-table td {
+    border: none;
+    border-bottom: 1px solid rgba(201, 166, 91, 0.15);
+    position: relative;
+    padding: 0.75rem 0 0.75rem 45%;
+    text-align: right;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .market-table td:last-child {
+    border-bottom: 0;
+  }
+  .market-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 40%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-dark-secondary);
+  }
 }
 
 @media (max-width: 480px) {
@@ -1246,7 +1325,7 @@ a:hover { color: var(--color-gold-hover); }
   .stat-card-dark { padding: 1.25rem 0.6rem; }
   .stat-number-counter { font-size: 1.65rem; }
   .stat-label-dark { font-size: 0.68rem; }
-  .closing-cta-fullbleed h2 { font-size: 1.6rem; }
+  .certifications-container { grid-template-columns: 1fr 1fr; }
 }
 
 

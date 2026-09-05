@@ -324,13 +324,13 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                   
                   return (
                     <tr key={order.id}>
-                      <td>
+                      <td data-label="Order Ref">
                         <div style={{ fontWeight: '700', color: 'var(--text-dark-primary)', fontFamily: 'var(--font-mono)' }}>{order.order_ref || `AJM-ORD-${order.id}`}</div>
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-secondary)', marginTop: '0.1rem' }}>
                           {dateString}
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Sourced">
                         <div style={{ fontWeight: '600', color: 'var(--text-dark-primary)' }}>
                           {order.quantity} {order.quantity_unit} of {order.fish_type}
                         </div>
@@ -338,17 +338,17 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                           ₹{parseFloat(totalVal).toLocaleString('en-IN')} INR
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Location">
                         <div style={{ maxWidth: '180px', whiteSpace: 'normal', fontSize: '0.82rem', color: 'var(--text-dark-secondary)' }}>
                           {order.delivery_location}
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Status">
                         <span className={`badge badge-${(order.status || 'pending').toLowerCase()}`}>
                           {order.status}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Coordinates">
                         {order.google_maps_link ? (
                           <a 
                             href={order.google_maps_link} 
@@ -364,7 +364,7 @@ export default function BulkOrderingPortal({ preSelectedFish, user, onOpenAuth }
                           <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-secondary)' }}>N/A</span>
                         )}
                       </td>
-                      <td>
+                      <td data-label="Tracker">
                         {order.tracking_link ? (
                           <a 
                             href={order.tracking_link} 

@@ -577,9 +577,13 @@ export default function App() {
           </div>
           <div className="footer-col">
             <h4>Business Compliance</h4>
-            <p>📞 {siteSettings.footer_phone || '+91 891 255 1204'}</p>
-            <p>✉️ {siteSettings.footer_email || 'wholesale@ajmfisheries.com'}</p>
-            <div style={{ marginTop: '0.75rem', padding: '0.4rem 0.75rem', background: 'rgba(201, 166, 91, 0.1)', border: '1px solid var(--color-border-gold)', borderRadius: '4px', display: 'inline-block' }}>
+            <a href={`tel:${(siteSettings.footer_phone || '+91 891 255 1204').replace(/\s+/g, '')}`} style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', gap: '0.4rem' }}>
+              📞 {siteSettings.footer_phone || '+91 891 255 1204'}
+            </a>
+            <a href={`mailto:${siteSettings.footer_email || 'wholesale@ajmfisheries.com'}`} style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', gap: '0.4rem' }}>
+              ✉️ {siteSettings.footer_email || 'wholesale@ajmfisheries.com'}
+            </a>
+            <div style={{ marginTop: '0.5rem', padding: '0.4rem 0.75rem', background: 'rgba(201, 166, 91, 0.1)', border: '1px solid var(--color-border-gold)', borderRadius: '4px', display: 'inline-block' }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--color-gold)', fontWeight: 'bold' }}>
                 GSTIN: {siteSettings.footer_gstin || '37AAHCA8492K1Z9'}
               </span>

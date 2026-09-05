@@ -18,23 +18,39 @@ export default function ScrollAnimations({ activeView }) {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
-    // Native scrolling speed — GSAP ScrollTrigger manages reveal animations without hijacking wheel speed.
+    const isMobile = window.innerWidth <= 768;
+
+    // 1. Lenis Smooth Inertia Scroll (Desktop optimized, native touch priority)
+    let lenis = null;
+    if (!isMobile) {
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothTouch: false,
+      });
+
+      const raf = (time) => {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      };
+      requestAnimationFrame(raf);
+    }
 
     // 2. GSAP Animations Context
     const ctx = gsap.context(() => {
-      // A. Hero Section Cinematic Entrance
+      // A. Hero Section Entrance (simplified & faster on mobile)
       const heroTl = gsap.timeline();
       heroTl.fromTo(
         '.hero-bg-img',
-        { scale: 1.15, opacity: 0.8 },
-        { scale: 1, opacity: 1, duration: 2, ease: 'power2.out' },
+        { scale: 1.12, opacity: 0.8 },
+        { scale: 1, opacity: 1, duration: isMobile ? 1.2 : 2, ease: 'power2.out' },
         0
       );
       heroTl.fromTo(
         ['.hero-badge', '.hero-title', '.hero-subtitle', '.hero-ctas'],
-        { y: 35, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power3.out' },
-        0.3
+        { y: isMobile ? 20 : 35, opacity: 0 },
+        { y: 0, opacity: 1, duration: isMobile ? 0.6 : 0.9, stagger: isMobile ? 0.08 : 0.15, ease: 'power3.out' },
+        0.2
       );
 
       // B. Standard Section Reveals
@@ -42,15 +58,15 @@ export default function ScrollAnimations({ activeView }) {
       revealElements.forEach((el) => {
         gsap.fromTo(
           el,
-          { y: 45, opacity: 0 },
+          { y: isMobile ? 25 : 45, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.8,
+            duration: isMobile ? 0.6 : 0.8,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: el,
-              start: 'top 85%',
+              start: 'top 88%',
               toggleActions: 'play none none none',
             },
           }
@@ -64,16 +80,16 @@ export default function ScrollAnimations({ activeView }) {
         if (cards.length > 0) {
           gsap.fromTo(
             cards,
-            { y: 40, opacity: 0 },
+            { y: isMobile ? 20 : 40, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              duration: 0.7,
-              stagger: 0.12,
+              duration: isMobile ? 0.5 : 0.7,
+              stagger: isMobile ? 0.08 : 0.12,
               ease: 'power2.out',
               scrollTrigger: {
                 trigger: grid,
-                start: 'top 82%',
+                start: 'top 85%',
                 toggleActions: 'play none none none',
               },
             }
@@ -86,7 +102,7 @@ export default function ScrollAnimations({ activeView }) {
       if (statSection) {
         ScrollTrigger.create({
           trigger: statSection,
-          start: 'top 75%',
+          start: 'top 80%',
           onEnter: () => {
             const statNumbers = document.querySelectorAll('.stat-number-counter');
             statNumbers.forEach((numEl) => {
@@ -100,7 +116,7 @@ export default function ScrollAnimations({ activeView }) {
                 const obj = { val: 0 };
                 gsap.to(obj, {
                   val: numericValue,
-                  duration: 1.8,
+                  duration: isMobile ? 1.2 : 1.8,
                   ease: 'power1.out',
                   onUpdate: () => {
                     numEl.innerText = `${prefix}${Math.floor(obj.val).toLocaleString()}${suffix}`;
@@ -121,42 +137,62 @@ export default function ScrollAnimations({ activeView }) {
         if (steps.length > 0) {
           gsap.fromTo(
             steps,
-            { y: 30, opacity: 0 },
+            { y: 20, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              duration: 0.6,
-              stagger: 0.2,
+              duration: 0.5,
+              stagger: 0.15,
               ease: 'power2.out',
               scrollTrigger: {
                 trigger: journeySection,
-                start: 'top 70%',
+                start: 'top 75%',
               },
             }
           );
         }
 
         if (fishIcon) {
-          gsap.fromTo(
-            fishIcon,
-            { x: '0%' },
-            {
-              x: '85%',
-              ease: 'none',
-              scrollTrigger: {
-                trigger: journeySection,
-                start: 'top 60%',
-                end: 'bottom 40%',
-                scrub: 1,
-              },
-            }
-          );
+          if (isMobile) {
+            // Vertical timeline scrub on mobile
+            gsap.fromTo(
+              fishIcon,
+              { y: '0%' },
+              {
+                y: '85%',
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: journeySection,
+                  start: 'top 60%',
+                  end: 'bottom 40%',
+                  scrub: 1,
+                },
+              }
+            );
+          } else {
+            // Horizontal scrub on desktop
+            gsap.fromTo(
+              fishIcon,
+              { x: '0%' },
+              {
+                x: '85%',
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: journeySection,
+                  start: 'top 60%',
+                  end: 'bottom 40%',
+                  scrub: 1,
+                },
+              }
+            );
+          }
         }
       }
     });
 
     // Cleanup on unmount or view change
     return () => {
+      if (lenis) lenis.destroy();
       ctx.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };

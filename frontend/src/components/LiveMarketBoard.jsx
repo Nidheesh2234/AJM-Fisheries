@@ -105,7 +105,7 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
             <tbody>
               {inventory.map((fish) => (
                 <tr key={fish.id}>
-                  <td>
+                  <td data-label="Species">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       {fish.image_url ? (
                         <img 
@@ -137,23 +137,23 @@ export default function LiveMarketBoard({ onOrderSelect, user, onOpenAuth }) {
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Category">
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-dark-secondary)' }}>
                       {fish.category || 'Fish'}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Price (INR)">
                     <div className="fish-price">
                       ₹{parseFloat(fish.current_price_inr || 0).toFixed(2)}{' '}
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-secondary)' }}>/ {fish.unit || 'kg'}</span>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     <span className={`badge ${fish.status === 'Available' ? 'badge-available' : 'badge-outofstock'}`}>
                       {fish.status}
                     </span>
                   </td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td data-label="Action" style={{ textAlign: 'right' }}>
                     <button 
                       className="btn btn-primary" 
                       style={{ padding: '0.4rem 0.9rem', fontSize: '0.78rem', minHeight: '36px' }}

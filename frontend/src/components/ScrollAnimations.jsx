@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Lenis from '@studio-freight/lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -7,7 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 /**
  * ScrollAnimations Component
- * Manages Lenis smooth inertia scroll & GSAP ScrollTrigger animations.
+ * Manages native browser scroll & GSAP ScrollTrigger animations.
  * Respects prefers-reduced-motion.
  */
 export default function ScrollAnimations({ activeView }) {
@@ -20,23 +19,7 @@ export default function ScrollAnimations({ activeView }) {
 
     const isMobile = window.innerWidth <= 768;
 
-    // 1. Lenis Smooth Inertia Scroll (Desktop optimized, native touch priority)
-    let lenis = null;
-    if (!isMobile) {
-      lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothTouch: false,
-      });
-
-      const raf = (time) => {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      };
-      requestAnimationFrame(raf);
-    }
-
-    // 2. GSAP Animations Context
+    // GSAP Animations Context (using native window scroll)
     const ctx = gsap.context(() => {
       // A. Hero Section Entrance (simplified & faster on mobile)
       const heroTl = gsap.timeline();
@@ -192,7 +175,6 @@ export default function ScrollAnimations({ activeView }) {
 
     // Cleanup on unmount or view change
     return () => {
-      if (lenis) lenis.destroy();
       ctx.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };

@@ -99,43 +99,45 @@ export default function Navigation({ user, currentView, onViewChange, onOpenAuth
       {/* Center Navigation Links + Right Actions — slide-out on mobile */}
       <div className={`navbar-drawer ${mobileMenuOpen ? 'open' : ''}`} ref={menuRef}>
         <div className="navbar-menu">
-          <button className={`navbar-link ${currentView === 'home' ? 'active' : ''}`} onClick={() => handleNavClick('home')}>
-            Home
-          </button>
-          <button className="navbar-link" onClick={() => scrollToSection('about-section')}>
-            About Us
-          </button>
-          <button className="navbar-link" onClick={() => scrollToSection('founder-story')}>
-            Our Story
-          </button>
-          <button className="navbar-link" onClick={() => scrollToSection('how-it-works-journey')}>
-            How It Works
-          </button>
-          <button className="navbar-link" onClick={() => scrollToSection('rates-ticker')}>
-            Daily Rates
-          </button>
-          <button className="navbar-link" onClick={() => scrollToSection('contact-section')}>
-            Contact
-          </button>
-
-          {user && (
-            <button 
-              className={`navbar-link ${currentView === 'portal' ? 'active' : ''}`}
-              onClick={() => handleNavClick('portal')}
-              style={{ color: 'var(--color-gold)', fontWeight: '600' }}
-            >
-              Purchase Portal
-            </button>
-          )}
-
-          {user && user.role === 'admin' && (
-            <button 
-              className={`navbar-link ${currentView === 'admin' ? 'active' : ''}`}
-              onClick={() => handleNavClick('admin')}
-              style={{ border: '1px solid var(--color-border-gold)', padding: '0.25rem 0.6rem', borderRadius: '4px', color: 'var(--color-gold)' }}
-            >
-              Admin Dashboard
-            </button>
+          {user ? (
+            user.role === 'admin' ? (
+              <button 
+                className={`navbar-link ${currentView === 'admin' ? 'active' : ''}`}
+                onClick={() => handleNavClick('admin')}
+                style={{ color: 'var(--color-gold)', fontWeight: '600' }}
+              >
+                Admin Portal
+              </button>
+            ) : (
+              <button 
+                className={`navbar-link ${currentView === 'portal' ? 'active' : ''}`}
+                onClick={() => handleNavClick('portal')}
+                style={{ color: 'var(--color-gold)', fontWeight: '600' }}
+              >
+                Purchase Portal
+              </button>
+            )
+          ) : (
+            <>
+              <button className={`navbar-link ${currentView === 'home' ? 'active' : ''}`} onClick={() => handleNavClick('home')}>
+                Home
+              </button>
+              <button className="navbar-link" onClick={() => scrollToSection('about-section')}>
+                About Us
+              </button>
+              <button className="navbar-link" onClick={() => scrollToSection('founder-story')}>
+                Our Story
+              </button>
+              <button className="navbar-link" onClick={() => scrollToSection('how-it-works-journey')}>
+                How It Works
+              </button>
+              <button className="navbar-link" onClick={() => scrollToSection('rates-ticker')}>
+                Daily Rates
+              </button>
+              <button className="navbar-link" onClick={() => scrollToSection('contact-section')}>
+                Contact
+              </button>
+            </>
           )}
         </div>
 
@@ -154,15 +156,17 @@ export default function Navigation({ user, currentView, onViewChange, onOpenAuth
               </button>
             </div>
           ) : (
-            <button className="btn btn-primary" onClick={() => { closeMobileMenu(); onOpenAuth(false); }} style={{ padding: '0.55rem 1.35rem', fontSize: '0.85rem' }}>
-              View Today's Rates
-            </button>
-          )}
+            <>
+              <button className="btn btn-primary" onClick={() => { closeMobileMenu(); onOpenAuth(false); }} style={{ padding: '0.55rem 1.35rem', fontSize: '0.85rem' }}>
+                View Today's Rates
+              </button>
 
-          {/* Staff Portal Outlined Gold Button */}
-          <button className="btn btn-secondary" onClick={handleAdminLoginClick} id="admin-login-nav-btn" style={{ padding: '0.55rem 1.1rem', fontSize: '0.85rem' }}>
-            Staff Portal
-          </button>
+              {/* Staff Portal Outlined Gold Button */}
+              <button className="btn btn-secondary" onClick={handleAdminLoginClick} id="admin-login-nav-btn" style={{ padding: '0.55rem 1.1rem', fontSize: '0.85rem' }}>
+                Staff Portal
+              </button>
+            </>
+          )}
         </div>
       </div>
     </nav>
